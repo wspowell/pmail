@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/wspowell/pmail/api/mailboxes"
 	"github.com/wspowell/pmail/api/users"
 	"github.com/wspowell/pmail/resources/db"
 
@@ -18,11 +19,11 @@ func Routes(server *spiderweb.Server) {
 		//ErrorHandler: error_handlers.ErrorJsonWithCodeResponse{},
 		LogConfig: logging.NewConfig(logging.LevelDebug, map[string]interface{}{}),
 		//MimeTypeHandlers: endpoint.NewMimeTypeHandlers(),
-		//RequestValidator:  validators.NoopRequest{},
+		//RequestValidator:  validators.No opRequest{},
 		//ResponseValidator: validators.NoopResponse{},
 		Resources: map[string]interface{}{
-			"userstore":    &db.Users{},
-			"mailboxstore": &db.Mailboxes{},
+			"userstore":    db.NewUsers(),
+			"mailboxstore": db.NewMailboxes(),
 			"mailstore":    &db.Mail{},
 		},
 		Timeout: 30 * time.Second,
@@ -30,6 +31,7 @@ func Routes(server *spiderweb.Server) {
 
 	server.HandleNotFound(config, &noRoute{})
 	users.Routes(server, config)
+	mailboxes.Routes(server, config)
 }
 
 type noRoute struct{}

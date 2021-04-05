@@ -5,32 +5,38 @@ import (
 
 	"github.com/wspowell/errors"
 	"github.com/wspowell/pmail/resources"
-	"github.com/wspowell/pmail/resources/db"
 	"github.com/wspowell/spiderweb/endpoint"
 )
 
+type userModel struct {
+	Username         string `json:"username"`
+	PineappleOnPizza bool   `json:"pineapple_on_pizza"`
+}
+
 type createUserRequest struct {
-	Username string `json:"username"`
+	userModel
 }
 
 type createUserResponse struct {
-	UserId uint `json:"user_id"`
+	UserId uint32 `json:"user_id"`
 }
 
 type createUser struct {
-	Users        *db.Users           `spiderweb:"resource=userstore"`
+	Users        resources.UserStore `spiderweb:"resource=userstore"`
 	RequestBody  *createUserRequest  `spiderweb:"request,mime=application/json"`
 	ResponseBody *createUserResponse `spiderweb:"response,mime=application/json"`
 }
 
 func (self *createUser) Handle(ctx *endpoint.Context) (int, error) {
 	userAttributes := resources.UserAttributes{
-		Username: self.RequestBody.Username,
+		PineappleOnPizza: self.RequestBody.PineappleOnPizza,
 	}
 
-	userId, err := self.Users.CreateUser(userAttributes)
+	userId, err := self.Users.CreateUser(self.RequestBody.Username, userAttributes)
 	if err != nil {
-		ctx.Error(icCreateUserError, "failed to create user: %#v", err)
+		if errors.Is(err, resources.ErrUsernameConflict) {
+			return http.StatusConflict, errors.Wrap(icCreateUserUsernameConflict, err)
+		}
 		return http.StatusInternalServerError, errors.Wrap(icCreateUserError, err)
 	}
 

@@ -1,21 +1,12 @@
 package server
 
 import (
-	"io"
 	"time"
 
 	"github.com/wspowell/logging"
 	"github.com/wspowell/pmail/api"
 	"github.com/wspowell/spiderweb"
 )
-
-type NoopLogConfig struct {
-	*logging.Config
-}
-
-func (self *NoopLogConfig) Out() io.Writer {
-	return io.Discard
-}
 
 func New() *spiderweb.Server {
 	serverConfig := &spiderweb.ServerConfig{
