@@ -1,2 +1,6 @@
 pmail
 /pkg
+vendor/
+*_bin
+
+
