@@ -13,11 +13,11 @@ var (
 )
 
 const (
-	icMailboxOwned      = "resources-mailboxstore-1"
 	icHomeMailboxExists = "resources-mailboxstore-2"
+	icMailboxNotFound   = "resources-mailboxstore-3"
 )
 
 var (
-	ErrMailboxOwned      = errors.New(icMailboxOwned, "mailbox already owned")
 	ErrHomeMailboxExists = errors.New(icHomeMailboxExists, "user already has home mailbox")
+	ErrorMailboxNotFound = errors.New(icMailboxNotFound, "mailbox not found")
 )

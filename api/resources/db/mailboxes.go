@@ -7,6 +7,8 @@ import (
 	"github.com/wspowell/pmail/resources"
 )
 
+var _ resources.MailboxStore = (*Mailboxes)(nil)
+
 type Mailboxes struct {
 	mailboxIdToMailbox map[uint32]resources.Mailbox
 	userIdToMailboxId  map[uint32]uint32
@@ -21,31 +23,41 @@ func NewMailboxes() *Mailboxes {
 	}
 }
 
-func (self *Mailboxes) CreateMailbox(attributes resources.MailboxAttributes) (uint32, error) {
+func (self *Mailboxes) CreateMailbox(userId uint32, attributes resources.MailboxAttributes) (uint32, error) {
+	if _, exists := self.userIdToMailboxId[userId]; exists {
+		return 0, errors.Wrap(icMailboxesUserHomeMailboxExists, resources.ErrHomeMailboxExists)
+	}
+
 	mailboxId := rand.Uint32()
 
 	self.mailboxIdToMailbox[mailboxId] = resources.Mailbox{
+		MailboxId:  mailboxId,
 		Attributes: attributes,
 	}
-
-	return mailboxId, nil
-}
-func (self *Mailboxes) SetHomeMailbox(mailboxId uint32, userId uint32) error {
-	if _, exists := self.mailboxIdToUserId[mailboxId]; exists {
-		return errors.Wrap(icMailboxesMailboxOwned, resources.ErrMailboxOwned)
-	}
-	if _, exists := self.userIdToMailboxId[userId]; exists {
-		return errors.Wrap(icMailboxesUserHomeMailboxExists, resources.ErrHomeMailboxExists)
-	}
-
 	self.mailboxIdToUserId[mailboxId] = userId
 	self.userIdToMailboxId[userId] = mailboxId
 
-	return nil
+	return mailboxId, nil
 }
-func (self *Mailboxes) RemoveHomeMailbox(mailboxId uint32, userId uint32) error {
-	panic("not implemented") // TODO: Implement
+
+func (self *Mailboxes) GetMailboxById(mailboxId uint32) (*resources.Mailbox, error) {
+	if mailbox, exists := self.mailboxIdToMailbox[mailboxId]; exists {
+		return &mailbox, nil
+	}
+
+	return nil, errors.Wrap(icMailboxesMailboxNotFound, resources.ErrorMailboxNotFound)
 }
+
+func (self *Mailboxes) GetMailboxByUserId(userId uint32) (*resources.Mailbox, error) {
+	if mailboxId, exists := self.userIdToMailboxId[userId]; exists {
+		if mailbox, exists := self.mailboxIdToMailbox[mailboxId]; exists {
+			return &mailbox, nil
+		}
+	}
+
+	return nil, errors.Wrap(icMailboxesMailboxNotFound, resources.ErrorMailboxNotFound)
+}
+
 func (self *Mailboxes) FindNearbyMailboxes(location resources.GeoCoordinate, radius float32) error {
 	panic("not implemented") // TODO: Implement
 }

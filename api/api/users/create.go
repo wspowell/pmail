@@ -11,6 +11,7 @@ import (
 type userModel struct {
 	Username         string `json:"username"`
 	PineappleOnPizza bool   `json:"pineapple_on_pizza"`
+	MailboxId        uint32 `json:"mailbox_id,omitempty"`
 }
 
 type createUserRequest struct {

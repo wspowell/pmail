@@ -9,4 +9,5 @@ const (
 const (
 	icMailboxesMailboxOwned          = "db-mailboxes-1"
 	icMailboxesUserHomeMailboxExists = "db-mailboxs-2"
+	icMailboxesMailboxNotFound       = "db-mailboxes-3"
 )

@@ -6,6 +6,7 @@ import (
 
 	"github.com/wspowell/pmail/api/mailboxes"
 	"github.com/wspowell/pmail/api/users"
+	"github.com/wspowell/pmail/api/users/mailbox"
 	"github.com/wspowell/pmail/resources/db"
 
 	"github.com/wspowell/logging"
@@ -24,13 +25,14 @@ func Routes(server *spiderweb.Server) {
 		Resources: map[string]interface{}{
 			"userstore":    db.NewUsers(),
 			"mailboxstore": db.NewMailboxes(),
-			"mailstore":    &db.Mail{},
+			"mailstore":    db.NewMails(),
 		},
 		Timeout: 30 * time.Second,
 	}
 
 	server.HandleNotFound(config, &noRoute{})
 	users.Routes(server, config)
+	mailbox.Routes(server, config)
 	mailboxes.Routes(server, config)
 }
 

@@ -8,29 +8,18 @@ type GeoCoordinate struct {
 	Lng Longitude
 }
 
-type MailboxType uint8
-
-const (
-	// Home of a user. Only the owner can dropoff mail.
-	Home = MailboxType(1)
-	// Dropoff mail only. Public dropoff location.
-	Dropoff = MailboxType(2)
-	// Exchange mail by dropping off and picking up. Public location.
-	Exchange = MailboxType(3)
-)
-
 type Mailbox struct {
+	MailboxId  uint32
 	Attributes MailboxAttributes
 }
 
 type MailboxAttributes struct {
-	Type     MailboxType
 	Location GeoCoordinate
 }
 
 type MailboxStore interface {
-	CreateMailbox(attributes MailboxAttributes) (uint32, error)
-	SetHomeMailbox(mailboxId uint32, userId uint32) error
-	RemoveHomeMailbox(mailboxId uint32, userId uint32) error
+	CreateMailbox(userId uint32, attributes MailboxAttributes) (uint32, error)
+	GetMailboxById(mailboxId uint32) (*Mailbox, error)
+	GetMailboxByUserId(userId uint32) (*Mailbox, error)
 	FindNearbyMailboxes(location GeoCoordinate, radius float32) error
 }
