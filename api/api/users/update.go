@@ -3,10 +3,10 @@ package users
 import (
 	"net/http"
 
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
 	"github.com/wspowell/pmail/resources"
-	"github.com/wspowell/spiderweb/endpoint"
 )
 
 type updateUserRequest struct {
@@ -19,7 +19,7 @@ type updateUser struct {
 	RequestBody *updateUserRequest  `spiderweb:"request,mime=application/json"`
 }
 
-func (self *updateUser) Handle(ctx *endpoint.Context) (int, error) {
+func (self *updateUser) Handle(ctx context.Context) (int, error) {
 	userAttributes := resources.UserAttributes{
 		PineappleOnPizza: self.RequestBody.PineappleOnPizza,
 	}

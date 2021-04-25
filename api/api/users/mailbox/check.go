@@ -3,9 +3,9 @@ package mailbox
 import (
 	"net/http"
 
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/pmail/resources"
-	"github.com/wspowell/spiderweb/endpoint"
 )
 
 type checkMailboxResponse struct {
@@ -19,7 +19,7 @@ type checkMailbox struct {
 	ResponseBody *checkMailboxResponse  `spiderweb:"response,mime=application/json"`
 }
 
-func (self *checkMailbox) Handle(ctx *endpoint.Context) (int, error) {
+func (self *checkMailbox) Handle(ctx context.Context) (int, error) {
 	mailbox, err := self.Mailboxes.GetMailboxByUserId(self.UserId)
 	if err != nil {
 		return http.StatusInternalServerError, errors.Wrap(icCheckMailboxLookupError, err)

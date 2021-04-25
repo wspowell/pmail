@@ -3,10 +3,10 @@ package users
 import (
 	"net/http"
 
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
 	"github.com/wspowell/pmail/resources"
-	"github.com/wspowell/spiderweb/endpoint"
 )
 
 type userModel struct {
@@ -29,7 +29,7 @@ type createUser struct {
 	ResponseBody *createUserResponse `spiderweb:"response,mime=application/json"`
 }
 
-func (self *createUser) Handle(ctx *endpoint.Context) (int, error) {
+func (self *createUser) Handle(ctx context.Context) (int, error) {
 	userAttributes := resources.UserAttributes{
 		PineappleOnPizza: self.RequestBody.PineappleOnPizza,
 	}

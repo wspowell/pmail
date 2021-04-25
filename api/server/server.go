@@ -15,6 +15,7 @@ func New() *server.Server {
 		Port:         8080,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
+		EnablePprof:  true,
 	}
 
 	server := server.New(serverConfig)

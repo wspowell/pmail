@@ -3,9 +3,9 @@ package users
 import (
 	"net/http"
 
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/pmail/resources"
-	"github.com/wspowell/spiderweb/endpoint"
 )
 
 type getUserResponse struct {
@@ -19,7 +19,7 @@ type getUser struct {
 	ResponseBody *getUserResponse       `spiderweb:"response,mime=application/json"`
 }
 
-func (self *getUser) Handle(ctx *endpoint.Context) (int, error) {
+func (self *getUser) Handle(ctx context.Context) (int, error) {
 	user, err := self.Users.GetUser(self.UserId)
 	if err != nil {
 		if errors.Is(err, resources.ErrUserNotFound) {

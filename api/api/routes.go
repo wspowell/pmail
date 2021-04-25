@@ -9,6 +9,7 @@ import (
 	"github.com/wspowell/pmail/api/users/mailbox"
 	"github.com/wspowell/pmail/resources/db"
 
+	"github.com/wspowell/context"
 	"github.com/wspowell/log"
 	"github.com/wspowell/spiderweb/endpoint"
 	"github.com/wspowell/spiderweb/server"
@@ -38,6 +39,6 @@ func Routes(server *server.Server) {
 
 type noRoute struct{}
 
-func (self *noRoute) Handle(ctx *endpoint.Context) (int, error) {
+func (self *noRoute) Handle(ctx context.Context) (int, error) {
 	return http.StatusNotFound, nil
 }

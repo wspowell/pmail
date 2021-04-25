@@ -3,10 +3,10 @@ package mailbox
 import (
 	"net/http"
 
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
 	"github.com/wspowell/pmail/resources"
-	"github.com/wspowell/spiderweb/endpoint"
 )
 
 type mailboxModel struct {
@@ -33,7 +33,7 @@ type createMailbox struct {
 	ResponseBody *createMailboxResponse `spiderweb:"response,mime=application/json"`
 }
 
-func (self *createMailbox) Handle(ctx *endpoint.Context) (int, error) {
+func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 	mailbox, err := self.Mailboxes.GetMailboxByUserId(self.UserId)
 	if err != nil {
 		// This error is expected.

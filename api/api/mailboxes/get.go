@@ -3,9 +3,9 @@ package mailboxes
 import (
 	"net/http"
 
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/pmail/resources"
-	"github.com/wspowell/spiderweb/endpoint"
 )
 
 type mailboxModel struct {
@@ -27,7 +27,7 @@ type getMailbox struct {
 	ResponseBody *getMailboxResponse    `spiderweb:"response,mime=application/json"`
 }
 
-func (self *getMailbox) Handle(ctx *endpoint.Context) (int, error) {
+func (self *getMailbox) Handle(ctx context.Context) (int, error) {
 	mailbox, err := self.Mailboxes.GetMailboxById(self.MailboxId)
 	if err != nil {
 		if errors.Is(err, resources.ErrorMailboxNotFound) {
