@@ -9,16 +9,16 @@ import (
 	"github.com/wspowell/pmail/api/users/mailbox"
 	"github.com/wspowell/pmail/resources/db"
 
-	"github.com/wspowell/logging"
-	"github.com/wspowell/spiderweb"
+	"github.com/wspowell/log"
 	"github.com/wspowell/spiderweb/endpoint"
+	"github.com/wspowell/spiderweb/server"
 )
 
-func Routes(server *spiderweb.Server) {
+func Routes(server *server.Server) {
 	config := &endpoint.Config{
 		//Auther:       auth.Noop{},
 		//ErrorHandler: error_handlers.ErrorJsonWithCodeResponse{},
-		LogConfig: logging.NewConfig(logging.LevelDebug, map[string]interface{}{}),
+		LogConfig: log.NewConfig(log.LevelDebug),
 		//MimeTypeHandlers: endpoint.NewMimeTypeHandlers(),
 		//RequestValidator:  validators.No opRequest{},
 		//ResponseValidator: validators.NoopResponse{},

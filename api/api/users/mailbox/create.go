@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/wspowell/errors"
+	"github.com/wspowell/log"
 	"github.com/wspowell/pmail/resources"
 	"github.com/wspowell/spiderweb/endpoint"
 )
@@ -60,7 +61,7 @@ func (self *createMailbox) Handle(ctx *endpoint.Context) (int, error) {
 		return http.StatusInternalServerError, errors.Wrap(icCreateMailboxError, err)
 	}
 
-	ctx.Debug("created mailbox: %d", mailboxId)
+	log.Debug(ctx, "created mailbox: %d", mailboxId)
 
 	self.ResponseBody.MailboxId = mailboxId
 

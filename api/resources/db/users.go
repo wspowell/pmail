@@ -72,5 +72,5 @@ func (self *Users) UpdateUser(userId uint32, newAttributes resources.UserAttribu
 		return nil
 	}
 
-	return errors.New(icUpdateUserUserNotFound, "user id not found: %v", userId)
+	return errors.Wrap(icUpdateUserUserNotFound, resources.ErrUserNotFound)
 }

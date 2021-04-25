@@ -27,5 +27,5 @@ func (self *Mails) CollectMail(mailboxId uint32) ([]uint32, error) {
 }
 
 func (self *Mails) DepositMail(mailId uint32, mailboxId uint32) error {
-	panic("not implemented") // TODO: I
+	panic("not implemented") // TODO: Implement
 }

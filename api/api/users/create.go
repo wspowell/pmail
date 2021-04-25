@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/wspowell/errors"
+	"github.com/wspowell/log"
 	"github.com/wspowell/pmail/resources"
 	"github.com/wspowell/spiderweb/endpoint"
 )
@@ -41,7 +42,7 @@ func (self *createUser) Handle(ctx *endpoint.Context) (int, error) {
 		return http.StatusInternalServerError, errors.Wrap(icCreateUserError, err)
 	}
 
-	ctx.Debug("created user: %d", userId)
+	log.Debug(ctx, "created user: %d", userId)
 
 	self.ResponseBody.UserId = userId
 

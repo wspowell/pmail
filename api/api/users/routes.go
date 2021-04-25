@@ -3,11 +3,11 @@ package users
 import (
 	"net/http"
 
-	"github.com/wspowell/spiderweb"
 	"github.com/wspowell/spiderweb/endpoint"
+	"github.com/wspowell/spiderweb/server"
 )
 
-func Routes(server *spiderweb.Server, config *endpoint.Config) {
+func Routes(server *server.Server, config *endpoint.Config) {
 	server.Handle(config, http.MethodPost, "/users", &createUser{})
 	server.Handle(config, http.MethodGet, "/users/{id}", &getUser{})
 	server.Handle(config, http.MethodPut, "/users/{id}", &updateUser{})

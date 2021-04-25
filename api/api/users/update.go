@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/wspowell/errors"
+	"github.com/wspowell/log"
 	"github.com/wspowell/pmail/resources"
 	"github.com/wspowell/spiderweb/endpoint"
 )
@@ -30,7 +31,7 @@ func (self *updateUser) Handle(ctx *endpoint.Context) (int, error) {
 		return http.StatusInternalServerError, errors.Wrap(icUpdateUserError, err)
 	}
 
-	ctx.Debug("updated user: %d", self.UserId)
+	log.Debug(ctx, "updated user: %d", self.UserId)
 
 	return http.StatusOK, nil
 }
