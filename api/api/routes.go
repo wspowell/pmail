@@ -15,8 +15,8 @@ import (
 	"github.com/wspowell/spiderweb/server"
 )
 
-func Routes(server *server.Server) {
-	config := &endpoint.Config{
+func Config() *endpoint.Config {
+	return &endpoint.Config{
 		//Auther:       auth.Noop{},
 		//ErrorHandler: error_handlers.ErrorJsonWithCodeResponse{},
 		LogConfig: log.NewConfig(log.LevelDebug),
@@ -30,6 +30,10 @@ func Routes(server *server.Server) {
 		},
 		Timeout: 30 * time.Second,
 	}
+}
+
+func Routes(server *server.Server) {
+	config := Config()
 
 	server.HandleNotFound(config, &noRoute{})
 	users.Routes(server, config)
