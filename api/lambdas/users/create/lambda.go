@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/wspowell/pmail/api"
-	"github.com/wspowell/pmail/api/users"
+	"github.com/wspowell/snailmail/api"
+	"github.com/wspowell/snailmail/api/users"
 )
 
 func main() {

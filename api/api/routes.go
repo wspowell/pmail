@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/wspowell/pmail/api/mailboxes"
-	"github.com/wspowell/pmail/api/users"
-	"github.com/wspowell/pmail/api/users/mailbox"
-	"github.com/wspowell/pmail/resources/db"
+	"github.com/wspowell/snailmail/api/mailboxes"
+	"github.com/wspowell/snailmail/api/users"
+	"github.com/wspowell/snailmail/api/users/mailbox"
+	"github.com/wspowell/snailmail/resources/db"
 
 	"github.com/wspowell/context"
 	"github.com/wspowell/log"

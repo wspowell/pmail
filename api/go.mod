@@ -1,4 +1,4 @@
-module github.com/wspowell/pmail
+module github.com/wspowell/snailmail
 
 go 1.16
 

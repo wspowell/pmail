@@ -1,6 +1,6 @@
 package mailboxes
 
 const (
-	icGetMailboxError    = "pmail-mailboxes-1"
-	icGetMailboxNotFound = "pmail-mailboxes-2"
+	icGetMailboxError    = "snailmail-mailboxes-1"
+	icGetMailboxNotFound = "snailmail-mailboxes-2"
 )

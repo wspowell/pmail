@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/wspowell/log"
-	"github.com/wspowell/pmail/api"
+	"github.com/wspowell/snailmail/api"
 	"github.com/wspowell/spiderweb/server"
 )
 

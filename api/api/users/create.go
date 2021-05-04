@@ -6,7 +6,7 @@ import (
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
-	"github.com/wspowell/pmail/resources"
+	"github.com/wspowell/snailmail/resources"
 )
 
 type userModel struct {

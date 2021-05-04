@@ -3,9 +3,8 @@ package db
 import (
 	"math/rand"
 
-	"github.com/wspowell/pmail/resources"
-
 	"github.com/wspowell/errors"
+	"github.com/wspowell/snailmail/resources"
 )
 
 var _ resources.UserStore = (*Users)(nil)

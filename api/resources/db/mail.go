@@ -1,6 +1,6 @@
 package db
 
-import "github.com/wspowell/pmail/resources"
+import "github.com/wspowell/snailmail/resources"
 
 var _ resources.MailStore = (*Mails)(nil)
 

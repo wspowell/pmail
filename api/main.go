@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/wspowell/pmail/server"
+	"github.com/wspowell/snailmail/server"
 )
 
 func main() {
-	pmail := server.New()
-	pmail.Listen()
+	snailmail := server.New()
+	snailmail.Listen()
 }
