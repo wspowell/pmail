@@ -31,3 +31,15 @@ func Routes(server *server.Server, config *endpoint.Config) {
 func LambdaCreate(config *endpoint.Config) *lambda.Lambda {
 	return lambda.New(config, create.path, create.handler)
 }
+
+func LambdaGet(config *endpoint.Config) *lambda.Lambda {
+	return lambda.New(config, get.path, get.handler)
+}
+
+func LambdaUpdate(config *endpoint.Config) *lambda.Lambda {
+	return lambda.New(config, update.path, update.handler)
+}
+
+func LambdaDelete(config *endpoint.Config) *lambda.Lambda {
+	return lambda.New(config, delete.path, delete.handler)
+}
