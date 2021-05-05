@@ -10,3 +10,6 @@ lambda:
 	zip snailmail_lambdas.zip users_create users_delete users_get users_update
 	
 	rm users_create users_delete users_get users_update
+
+mocks:
+	mockery --all --dir ./resources --output ./test/resources/mocks

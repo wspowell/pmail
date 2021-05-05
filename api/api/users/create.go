@@ -3,10 +3,11 @@ package users
 import (
 	"net/http"
 
+	"github.com/wspowell/snailmail/resources"
+
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
-	"github.com/wspowell/snailmail/resources"
 )
 
 type userModel struct {
