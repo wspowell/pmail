@@ -12,7 +12,7 @@ import (
 	"github.com/wspowell/context"
 	"github.com/wspowell/log"
 	"github.com/wspowell/spiderweb/endpoint"
-	"github.com/wspowell/spiderweb/server"
+	"github.com/wspowell/spiderweb/server/restful"
 )
 
 func Config() *endpoint.Config {
@@ -32,7 +32,7 @@ func Config() *endpoint.Config {
 	}
 }
 
-func Routes(server *server.Server) {
+func Routes(server *restful.Server) {
 	config := Config()
 
 	server.HandleNotFound(config, &noRoute{})

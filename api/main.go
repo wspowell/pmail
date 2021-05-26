@@ -5,6 +5,5 @@ import (
 )
 
 func main() {
-	snailmail := server.New()
-	snailmail.Listen()
+	server.New().Listen()
 }

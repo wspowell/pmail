@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/wspowell/spiderweb/endpoint"
-	"github.com/wspowell/spiderweb/lambda"
-	"github.com/wspowell/spiderweb/server"
+	"github.com/wspowell/spiderweb/server/lambda"
+	"github.com/wspowell/spiderweb/server/restful"
 )
 
 type definition struct {
@@ -21,7 +21,7 @@ var (
 	delete = definition{http.MethodDelete, "/users/{id}", &deleteUser{}}
 )
 
-func Routes(server *server.Server, config *endpoint.Config) {
+func Routes(server *restful.Server, config *endpoint.Config) {
 	server.Handle(config, create.method, create.path, create.handler)
 	server.Handle(config, get.method, get.path, get.handler)
 	server.Handle(config, update.method, update.path, update.handler)
