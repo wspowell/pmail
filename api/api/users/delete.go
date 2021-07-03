@@ -15,7 +15,7 @@ type deleteUser struct {
 }
 
 func (self *deleteUser) Handle(ctx context.Context) (int, error) {
-	if err := self.Users.DeleteUser(self.UserId); err != nil {
+	if err := self.Users.DeleteUser(ctx, self.UserId); err != nil {
 		log.Error(ctx, icDeleteUserError, "failed to delete user: %#v", err)
 		return http.StatusInternalServerError, errors.Wrap(icDeleteUserError, err)
 	}

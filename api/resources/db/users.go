@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"math/rand"
 
 	"github.com/wspowell/errors"
@@ -10,52 +11,53 @@ import (
 var _ resources.UserStore = (*Users)(nil)
 
 type Users struct {
-	userIdToUser     map[uint32]resources.User
+	userIdToUser     map[uint32]*resources.User
 	usernameToUserId map[string]uint32
 }
 
 func NewUsers() *Users {
 	return &Users{
-		userIdToUser:     map[uint32]resources.User{},
+		userIdToUser:     map[uint32]*resources.User{},
 		usernameToUserId: map[string]uint32{},
 	}
 }
 
-func (self *Users) userIdExists(userId uint32) bool {
+func (self *Users) userIdExists(ctx context.Context, userId uint32) bool {
 	_, exists := self.userIdToUser[userId]
 	return exists
 }
 
-func (self *Users) usernameExists(username string) bool {
+func (self *Users) usernameExists(ctx context.Context, username string) bool {
 	_, exists := self.usernameToUserId[username]
 	return exists
 }
 
-func (self *Users) CreateUser(username string, attributes resources.UserAttributes) (uint32, error) {
-	if self.usernameExists(username) {
-		return 0, errors.Wrap(icCreateUserUsernameConflict, resources.ErrUsernameConflict)
+func (self *Users) CreateUser(ctx context.Context, username string, attributes resources.UserAttributes) (*resources.User, error) {
+	if self.usernameExists(ctx, username) {
+		return nil, errors.Wrap(icCreateUserUsernameConflict, resources.ErrUsernameConflict)
 	}
 
-	userId := rand.Uint32()
-
-	self.userIdToUser[userId] = resources.User{
+	user := &resources.User{
+		Id:         rand.Uint32(),
 		Username:   username,
 		Attributes: attributes,
 	}
-	self.usernameToUserId[username] = userId
 
-	return userId, nil
+	self.userIdToUser[user.Id] = user
+	self.usernameToUserId[username] = user.Id
+
+	return user, nil
 }
 
-func (self *Users) GetUser(userId uint32) (*resources.User, error) {
+func (self *Users) GetUser(ctx context.Context, userId uint32) (*resources.User, error) {
 	if user, exists := self.userIdToUser[userId]; exists {
-		return &user, nil
+		return user, nil
 	}
 
 	return nil, errors.Wrap(icGetUserUserNotFound, resources.ErrUserNotFound)
 }
 
-func (self *Users) DeleteUser(userId uint32) error {
+func (self *Users) DeleteUser(ctx context.Context, userId uint32) error {
 	if user, exists := self.userIdToUser[userId]; exists {
 		delete(self.userIdToUser, userId)
 		delete(self.usernameToUserId, user.Username)
@@ -63,7 +65,7 @@ func (self *Users) DeleteUser(userId uint32) error {
 	return nil
 }
 
-func (self *Users) UpdateUser(userId uint32, newAttributes resources.UserAttributes) error {
+func (self *Users) UpdateUser(ctx context.Context, userId uint32, newAttributes resources.UserAttributes) error {
 	if user, exists := self.userIdToUser[userId]; exists {
 		user.Attributes = newAttributes
 

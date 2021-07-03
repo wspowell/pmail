@@ -28,7 +28,7 @@ type getMailbox struct {
 }
 
 func (self *getMailbox) Handle(ctx context.Context) (int, error) {
-	mailbox, err := self.Mailboxes.GetMailboxById(self.MailboxId)
+	mailbox, err := self.Mailboxes.GetMailboxById(ctx, self.MailboxId)
 	if err != nil {
 		if errors.Is(err, resources.ErrorMailboxNotFound) {
 			return http.StatusNotFound, errors.Wrap(icGetMailboxNotFound, err)

@@ -35,17 +35,19 @@ func (self *createUser) Handle(ctx context.Context) (int, error) {
 		PineappleOnPizza: self.RequestBody.PineappleOnPizza,
 	}
 
-	userId, err := self.Users.CreateUser(self.RequestBody.Username, userAttributes)
+	user, err := self.Users.CreateUser(ctx, self.RequestBody.Username, userAttributes)
 	if err != nil {
-		if errors.Is(err, resources.ErrUsernameConflict) {
+		switch err {
+		case resources.CreateUserErrorUsernameConflict:
 			return http.StatusConflict, errors.Wrap(icCreateUserUsernameConflict, err)
+		case resources.CreateUserErrorCreateFailure:
+			return http.StatusInternalServerError, errors.Wrap(icCreateUserError, err)
 		}
-		return http.StatusInternalServerError, errors.Wrap(icCreateUserError, err)
 	}
 
-	log.Debug(ctx, "created user: %d", userId)
+	log.Debug(ctx, "created user: %d", user.Id)
 
-	self.ResponseBody.UserId = userId
+	self.ResponseBody.UserId = user.Id
 
 	return http.StatusCreated, nil
 }

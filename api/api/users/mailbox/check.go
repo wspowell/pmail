@@ -20,19 +20,19 @@ type checkMailbox struct {
 }
 
 func (self *checkMailbox) Handle(ctx context.Context) (int, error) {
-	mailbox, err := self.Mailboxes.GetMailboxByUserId(self.UserId)
+	mailbox, err := self.Mailboxes.GetMailboxByUserId(ctx, self.UserId)
 	if err != nil {
 		return http.StatusInternalServerError, errors.Wrap(icCheckMailboxLookupError, err)
 	}
 
-	collectedMail, err := self.Mails.CollectMail(mailbox.MailboxId)
+	collectedMail, err := self.Mails.CollectMail(ctx, mailbox.Id)
 	if err != nil {
 		return http.StatusInternalServerError, errors.Wrap(icCheckMailboxCollectError, err)
 	}
 
 	readMail := make([]*resources.Mail, 0, len(collectedMail))
 	for _, m := range collectedMail {
-		read, err := self.Mails.ReadMail(m)
+		read, err := self.Mails.ReadMail(ctx, m)
 		if err != nil {
 			return http.StatusInternalServerError, errors.Wrap(icCheckMailboxReadError, err)
 		}

@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	mock "github.com/stretchr/testify/mock"
 	resources "github.com/wspowell/snailmail/resources"
 )
@@ -12,20 +14,20 @@ type MailboxStore struct {
 	mock.Mock
 }
 
-// CreateMailbox provides a mock function with given fields: userId, attributes
-func (_m *MailboxStore) CreateMailbox(userId uint32, attributes resources.MailboxAttributes) (uint32, error) {
-	ret := _m.Called(userId, attributes)
+// CreateMailbox provides a mock function with given fields: ctx, userId, attributes
+func (_m *MailboxStore) CreateMailbox(ctx context.Context, userId uint32, attributes resources.MailboxAttributes) (uint32, error) {
+	ret := _m.Called(ctx, userId, attributes)
 
 	var r0 uint32
-	if rf, ok := ret.Get(0).(func(uint32, resources.MailboxAttributes) uint32); ok {
-		r0 = rf(userId, attributes)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, resources.MailboxAttributes) uint32); ok {
+		r0 = rf(ctx, userId, attributes)
 	} else {
 		r0 = ret.Get(0).(uint32)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint32, resources.MailboxAttributes) error); ok {
-		r1 = rf(userId, attributes)
+	if rf, ok := ret.Get(1).(func(context.Context, uint32, resources.MailboxAttributes) error); ok {
+		r1 = rf(ctx, userId, attributes)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -33,13 +35,13 @@ func (_m *MailboxStore) CreateMailbox(userId uint32, attributes resources.Mailbo
 	return r0, r1
 }
 
-// FindNearbyMailboxes provides a mock function with given fields: location, radius
-func (_m *MailboxStore) FindNearbyMailboxes(location resources.GeoCoordinate, radius float32) error {
-	ret := _m.Called(location, radius)
+// FindNearbyMailboxes provides a mock function with given fields: ctx, location, radius
+func (_m *MailboxStore) FindNearbyMailboxes(ctx context.Context, location resources.GeoCoordinate, radius float32) error {
+	ret := _m.Called(ctx, location, radius)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(resources.GeoCoordinate, float32) error); ok {
-		r0 = rf(location, radius)
+	if rf, ok := ret.Get(0).(func(context.Context, resources.GeoCoordinate, float32) error); ok {
+		r0 = rf(ctx, location, radius)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -47,13 +49,13 @@ func (_m *MailboxStore) FindNearbyMailboxes(location resources.GeoCoordinate, ra
 	return r0
 }
 
-// GetMailboxById provides a mock function with given fields: mailboxId
-func (_m *MailboxStore) GetMailboxById(mailboxId uint32) (*resources.Mailbox, error) {
-	ret := _m.Called(mailboxId)
+// GetMailboxById provides a mock function with given fields: ctx, mailboxId
+func (_m *MailboxStore) GetMailboxById(ctx context.Context, mailboxId uint32) (*resources.Mailbox, error) {
+	ret := _m.Called(ctx, mailboxId)
 
 	var r0 *resources.Mailbox
-	if rf, ok := ret.Get(0).(func(uint32) *resources.Mailbox); ok {
-		r0 = rf(mailboxId)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) *resources.Mailbox); ok {
+		r0 = rf(ctx, mailboxId)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*resources.Mailbox)
@@ -61,8 +63,8 @@ func (_m *MailboxStore) GetMailboxById(mailboxId uint32) (*resources.Mailbox, er
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint32) error); ok {
-		r1 = rf(mailboxId)
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, mailboxId)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -70,13 +72,13 @@ func (_m *MailboxStore) GetMailboxById(mailboxId uint32) (*resources.Mailbox, er
 	return r0, r1
 }
 
-// GetMailboxByUserId provides a mock function with given fields: userId
-func (_m *MailboxStore) GetMailboxByUserId(userId uint32) (*resources.Mailbox, error) {
-	ret := _m.Called(userId)
+// GetMailboxByUserId provides a mock function with given fields: ctx, userId
+func (_m *MailboxStore) GetMailboxByUserId(ctx context.Context, userId uint32) (*resources.Mailbox, error) {
+	ret := _m.Called(ctx, userId)
 
 	var r0 *resources.Mailbox
-	if rf, ok := ret.Get(0).(func(uint32) *resources.Mailbox); ok {
-		r0 = rf(userId)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) *resources.Mailbox); ok {
+		r0 = rf(ctx, userId)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*resources.Mailbox)
@@ -84,8 +86,8 @@ func (_m *MailboxStore) GetMailboxByUserId(userId uint32) (*resources.Mailbox, e
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint32) error); ok {
-		r1 = rf(userId)
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, userId)
 	} else {
 		r1 = ret.Error(1)
 	}

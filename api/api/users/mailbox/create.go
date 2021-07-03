@@ -34,7 +34,7 @@ type createMailbox struct {
 }
 
 func (self *createMailbox) Handle(ctx context.Context) (int, error) {
-	mailbox, err := self.Mailboxes.GetMailboxByUserId(self.UserId)
+	mailbox, err := self.Mailboxes.GetMailboxByUserId(ctx, self.UserId)
 	if err != nil {
 		// This error is expected.
 		if !errors.Is(err, resources.ErrorMailboxNotFound) {
@@ -53,7 +53,7 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 		},
 	}
 
-	mailboxId, err := self.Mailboxes.CreateMailbox(self.UserId, mailboxAttributes)
+	mailboxId, err := self.Mailboxes.CreateMailbox(ctx, self.UserId, mailboxAttributes)
 	if err != nil {
 		if errors.Is(err, resources.ErrHomeMailboxExists) {
 			return http.StatusConflict, errors.Wrap(icCreateMailboxMailboxExistsOnCreate, err)

@@ -16,11 +16,11 @@ type getUser struct {
 	UserId       uint32                 `spiderweb:"path=id"`
 	Users        resources.UserStore    `spiderweb:"resource=userstore"`
 	MailboxStore resources.MailboxStore `spiderweb:"resource=mailboxstore"`
-	ResponseBody *getUserResponse       `spiderweb:"response,mime=application/json"`
+	ResponseBody *getUserResponse       `spiderweb:"response,mime=application/json,etag"`
 }
 
 func (self *getUser) Handle(ctx context.Context) (int, error) {
-	user, err := self.Users.GetUser(self.UserId)
+	user, err := self.Users.GetUser(ctx, self.UserId)
 	if err != nil {
 		if errors.Is(err, resources.ErrUserNotFound) {
 			return http.StatusNotFound, errors.Wrap(icGetUserUserNotFound, err)
@@ -28,7 +28,7 @@ func (self *getUser) Handle(ctx context.Context) (int, error) {
 		return http.StatusInternalServerError, errors.Wrap(icGetUserGetUserError, err)
 	}
 
-	mailbox, err := self.MailboxStore.GetMailboxByUserId(self.UserId)
+	mailbox, err := self.MailboxStore.GetMailboxByUserId(ctx, self.UserId)
 	if err != nil {
 		if errors.Is(err, resources.ErrorMailboxNotFound) {
 			// Ignore.
@@ -38,7 +38,7 @@ func (self *getUser) Handle(ctx context.Context) (int, error) {
 	}
 
 	if mailbox != nil {
-		self.ResponseBody.MailboxId = mailbox.MailboxId
+		self.ResponseBody.MailboxId = mailbox.Id
 	}
 
 	self.ResponseBody.userModel.Username = user.Username

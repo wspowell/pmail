@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	mock "github.com/stretchr/testify/mock"
 	resources "github.com/wspowell/snailmail/resources"
 )
@@ -12,13 +14,13 @@ type MailStore struct {
 	mock.Mock
 }
 
-// CollectMail provides a mock function with given fields: mailboxId
-func (_m *MailStore) CollectMail(mailboxId uint32) ([]uint32, error) {
-	ret := _m.Called(mailboxId)
+// CollectMail provides a mock function with given fields: ctx, mailboxId
+func (_m *MailStore) CollectMail(ctx context.Context, mailboxId uint32) ([]uint32, error) {
+	ret := _m.Called(ctx, mailboxId)
 
 	var r0 []uint32
-	if rf, ok := ret.Get(0).(func(uint32) []uint32); ok {
-		r0 = rf(mailboxId)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) []uint32); ok {
+		r0 = rf(ctx, mailboxId)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]uint32)
@@ -26,8 +28,8 @@ func (_m *MailStore) CollectMail(mailboxId uint32) ([]uint32, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint32) error); ok {
-		r1 = rf(mailboxId)
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, mailboxId)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -35,20 +37,20 @@ func (_m *MailStore) CollectMail(mailboxId uint32) ([]uint32, error) {
 	return r0, r1
 }
 
-// CreateMail provides a mock function with given fields: mail
-func (_m *MailStore) CreateMail(mail resources.Mail) (uint32, error) {
-	ret := _m.Called(mail)
+// CreateMail provides a mock function with given fields: ctx, mail
+func (_m *MailStore) CreateMail(ctx context.Context, mail resources.Mail) (uint32, error) {
+	ret := _m.Called(ctx, mail)
 
 	var r0 uint32
-	if rf, ok := ret.Get(0).(func(resources.Mail) uint32); ok {
-		r0 = rf(mail)
+	if rf, ok := ret.Get(0).(func(context.Context, resources.Mail) uint32); ok {
+		r0 = rf(ctx, mail)
 	} else {
 		r0 = ret.Get(0).(uint32)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(resources.Mail) error); ok {
-		r1 = rf(mail)
+	if rf, ok := ret.Get(1).(func(context.Context, resources.Mail) error); ok {
+		r1 = rf(ctx, mail)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -56,13 +58,13 @@ func (_m *MailStore) CreateMail(mail resources.Mail) (uint32, error) {
 	return r0, r1
 }
 
-// DepositMail provides a mock function with given fields: mailId, mailboxId
-func (_m *MailStore) DepositMail(mailId uint32, mailboxId uint32) error {
-	ret := _m.Called(mailId, mailboxId)
+// DepositMail provides a mock function with given fields: ctx, mailId, mailboxId
+func (_m *MailStore) DepositMail(ctx context.Context, mailId uint32, mailboxId uint32) error {
+	ret := _m.Called(ctx, mailId, mailboxId)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(uint32, uint32) error); ok {
-		r0 = rf(mailId, mailboxId)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32, uint32) error); ok {
+		r0 = rf(ctx, mailId, mailboxId)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -70,13 +72,13 @@ func (_m *MailStore) DepositMail(mailId uint32, mailboxId uint32) error {
 	return r0
 }
 
-// ReadMail provides a mock function with given fields: mailId
-func (_m *MailStore) ReadMail(mailId uint32) (*resources.Mail, error) {
-	ret := _m.Called(mailId)
+// ReadMail provides a mock function with given fields: ctx, mailId
+func (_m *MailStore) ReadMail(ctx context.Context, mailId uint32) (*resources.Mail, error) {
+	ret := _m.Called(ctx, mailId)
 
 	var r0 *resources.Mail
-	if rf, ok := ret.Get(0).(func(uint32) *resources.Mail); ok {
-		r0 = rf(mailId)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) *resources.Mail); ok {
+		r0 = rf(ctx, mailId)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*resources.Mail)
@@ -84,8 +86,8 @@ func (_m *MailStore) ReadMail(mailId uint32) (*resources.Mail, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(uint32) error); ok {
-		r1 = rf(mailId)
+	if rf, ok := ret.Get(1).(func(context.Context, uint32) error); ok {
+		r1 = rf(ctx, mailId)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -93,13 +95,13 @@ func (_m *MailStore) ReadMail(mailId uint32) (*resources.Mail, error) {
 	return r0, r1
 }
 
-// TrackMail provides a mock function with given fields: mailId
-func (_m *MailStore) TrackMail(mailId uint32) error {
-	ret := _m.Called(mailId)
+// TrackMail provides a mock function with given fields: ctx, mailId
+func (_m *MailStore) TrackMail(ctx context.Context, mailId uint32) error {
+	ret := _m.Called(ctx, mailId)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(uint32) error); ok {
-		r0 = rf(mailId)
+	if rf, ok := ret.Get(0).(func(context.Context, uint32) error); ok {
+		r0 = rf(ctx, mailId)
 	} else {
 		r0 = ret.Error(0)
 	}

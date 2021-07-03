@@ -24,7 +24,7 @@ func (self *updateUser) Handle(ctx context.Context) (int, error) {
 		PineappleOnPizza: self.RequestBody.PineappleOnPizza,
 	}
 
-	if err := self.Users.UpdateUser(self.UserId, userAttributes); err != nil {
+	if err := self.Users.UpdateUser(ctx, self.UserId, userAttributes); err != nil {
 		if errors.Is(err, resources.ErrUserNotFound) {
 			return http.StatusNotFound, errors.Wrap(icUpdateUserUserNotFound, err)
 		}

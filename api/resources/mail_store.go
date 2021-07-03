@@ -1,21 +1,33 @@
 package resources
 
-import "time"
+import (
+	"context"
+	"time"
+)
+
+type MailId uint32
 
 type Mail struct {
-	From     uint32
-	To       uint32
-	Contents string
+	Id MailId
 
 	// Metadata
 	SentOn      time.Time
 	DeliveredOn time.Time
+	OpenedOn    time.Time
+}
+
+type MailAttributes struct {
+	From     UserId
+	To       UserId
+	Contents string
 }
 
 type MailStore interface {
-	CreateMail(mail Mail) (uint32, error)
-	ReadMail(mailId uint32) (*Mail, error)
-	TrackMail(mailId uint32) error
-	CollectMail(mailboxId uint32) ([]uint32, error)
-	DepositMail(mailId uint32, mailboxId uint32) error
+	CreateMail(ctx context.Context, attributes MailAttributes) (MailId, error)
+
+	// OpenMail for viewing.
+	// Errors:
+	//   * ErrMailNotDelivered
+	//   * ErrUserNotRecipient
+	OpenMail(ctx context.Context, mailId MailId) (Mail, error)
 }
