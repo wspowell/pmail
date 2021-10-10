@@ -6,24 +6,11 @@ import (
 	"github.com/wspowell/errors"
 )
 
-const (
-	icCreateUserUsernameConflict = "resources-userstore-1"
-	icCreateUserFailed           = "resources-userstore-2"
-	icGetUserUserNotFound        = "resources-userstore-3"
-	icUpdateUserUserNotFound     = "resources-userstore-4"
-)
-
+// User store errors.
 var (
-	ErrCreateUserErrorUsernameConflict = errors.New(icCreateUserUsernameConflict, "username already exists")
-	ErrCreateUserErrorCreateFailure    = errors.New(icCreateUserFailed, "failed to create")
-)
-
-var (
-	ErrGetUserErrorUserNotFound = errors.New(icGetUserUserNotFound, "user id not found")
-)
-
-var (
-	ErrUpdateUserErrorUserNotFound = errors.New(icUpdateUserUserNotFound, "user id not found")
+	ErrUserStoreFailure = errors.New("resources-userstore-1", "internal user store failure")
+	ErrUsernameExists   = errors.New("resources-userstore-2", "username already exists")
+	ErrUserNotFound     = errors.New("resources-userstore-3", "user not found")
 )
 
 // FIXME: Ideally userId should be a uint64.
@@ -35,13 +22,35 @@ type User struct {
 }
 
 type UserAttributes struct {
-	Username         string
+	// Username to identity the user.
+	// Must be globally unique.
+	Username string
+
+	// PineappleOnPizza is always true, duh.
 	PineappleOnPizza bool
 }
 
 type UserStore interface {
+	// CreateUser with given attributes.
+	// Errors:
+	//   * ErrUsernameExists
+	//   * ErrUserStoreFailure
 	CreateUser(ctx context.Context, attributes UserAttributes) (User, error)
+
+	// GetUser using user ID.
+	// Errors:
+	//   * ErrUserNotFound
+	//   * ErrUserStoreFailure
 	GetUser(ctx context.Context, userId UserId) (User, error)
+
+	// DeleteUser using user ID.
+	// Errors:
+	//   * ErrUserStoreFailure
 	DeleteUser(ctx context.Context, userId UserId) error
+
+	// DeleteUser using user ID and new user attributes.
+	// Errors:
+	//   * ErrUsernameExists
+	//   * ErrUserStoreFailure
 	UpdateUser(ctx context.Context, userId UserId, newAttributes UserAttributes) error
 }

@@ -27,6 +27,8 @@ func functionName(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 
+// RunUserStoreTestCases for any given user store implementation.
+// Runs all unit tests that must pass regardless of implementation.
 func RunUserStoreTestCases(t *testing.T, userStore UserStore) {
 	for _, testCase := range UserStoreTestCases {
 		t.Run(functionName(testCase), func(t *testing.T) {
@@ -74,7 +76,7 @@ func TestCase_CreateUser_username_conflict(t *testing.T, users UserStore) {
 	}
 	user2, err := users.CreateUser(ctx, userAttributes)
 	assert.Nil(t, user2)
-	assert.ErrorIs(t, err, ErrCreateUserErrorUsernameConflict)
+	assert.ErrorIs(t, err, ErrUsernameExists)
 }
 
 func TestCase_GetUser_exists(t *testing.T, users UserStore) {
@@ -97,7 +99,7 @@ func TestCase_GetUser_not_exists(t *testing.T, users UserStore) {
 
 	foundUser, err := users.GetUser(ctx, UserId(uuid.New().ID()))
 	assert.Nil(t, foundUser)
-	assert.ErrorIs(t, err, ErrGetUserErrorUserNotFound)
+	assert.ErrorIs(t, err, ErrUserNotFound)
 }
 
 func TestCase_DeleteUser_exists(t *testing.T, users UserStore) {
