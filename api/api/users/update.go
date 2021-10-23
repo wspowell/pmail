@@ -7,6 +7,7 @@ import (
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
 	"github.com/wspowell/snailmail/resources"
+	"github.com/wspowell/snailmail/resources/db"
 )
 
 type updateUserRequest struct {
@@ -14,9 +15,9 @@ type updateUserRequest struct {
 }
 
 type updateUser struct {
-	UserId      uint32              `spiderweb:"path=id"`
-	Users       resources.UserStore `spiderweb:"resource=userstore"`
-	RequestBody *updateUserRequest  `spiderweb:"request,mime=application/json"`
+	UserId      uint32             `spiderweb:"path=id"`
+	Users       db.Datastore       `spiderweb:"resource=datastore"`
+	RequestBody *updateUserRequest `spiderweb:"request,mime=application/json"`
 }
 
 func (self *updateUser) Handle(ctx context.Context) (int, error) {

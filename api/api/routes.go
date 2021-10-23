@@ -24,9 +24,7 @@ func Config() *endpoint.Config {
 		//RequestValidator:  validators.No opRequest{},
 		//ResponseValidator: validators.NoopResponse{},
 		Resources: map[string]interface{}{
-			"userstore":    db.NewUsers(),
-			"mailboxstore": db.NewMailboxes(),
-			"mailstore":    db.NewMails(),
+			"datastore": db.NewInMemory(),
 		},
 		Timeout: 30 * time.Second,
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
 	"github.com/wspowell/snailmail/resources"
+	"github.com/wspowell/snailmail/resources/db"
 )
 
 type mailboxModel struct {
@@ -28,7 +29,7 @@ type createMailboxResponse struct {
 
 type createMailbox struct {
 	UserId       uint32                 `spiderweb:"path=user_id"`
-	Mailboxes    resources.MailboxStore `spiderweb:"resource=mailboxstore"`
+	Mailboxes    db.Datastore           `spiderweb:"resource=datastore"`
 	RequestBody  *createMailboxRequest  `spiderweb:"request,mime=application/json"`
 	ResponseBody *createMailboxResponse `spiderweb:"response,mime=application/json"`
 }

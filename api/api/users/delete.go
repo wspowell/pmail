@@ -6,12 +6,12 @@ import (
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
-	"github.com/wspowell/snailmail/resources"
+	"github.com/wspowell/snailmail/resources/db"
 )
 
 type deleteUser struct {
-	UserId uint32              `spiderweb:"path=id"`
-	Users  resources.UserStore `spiderweb:"resource=userstore"`
+	UserId uint32       `spiderweb:"path=id"`
+	Users  db.Datastore `spiderweb:"resource=datastore"`
 }
 
 func (self *deleteUser) Handle(ctx context.Context) (int, error) {

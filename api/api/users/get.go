@@ -6,6 +6,7 @@ import (
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/snailmail/resources"
+	"github.com/wspowell/snailmail/resources/db"
 )
 
 type getUserResponse struct {
@@ -13,10 +14,10 @@ type getUserResponse struct {
 }
 
 type getUser struct {
-	UserId       uint32                 `spiderweb:"path=id"`
-	Users        resources.UserStore    `spiderweb:"resource=userstore"`
-	MailboxStore resources.MailboxStore `spiderweb:"resource=mailboxstore"`
-	ResponseBody *getUserResponse       `spiderweb:"response,mime=application/json,etag"`
+	UserId       uint32           `spiderweb:"path=id"`
+	Users        db.Datastore     `spiderweb:"resource=datastore"`
+	MailboxStore db.Datastore     `spiderweb:"resource=datastore"`
+	ResponseBody *getUserResponse `spiderweb:"response,mime=application/json,etag"`
 }
 
 func (self *getUser) Handle(ctx context.Context) (int, error) {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/wspowell/snailmail/resources"
+	"github.com/wspowell/snailmail/resources/db"
 
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
@@ -25,7 +26,7 @@ type createUserResponse struct {
 }
 
 type createUser struct {
-	Users        resources.UserStore `spiderweb:"resource=userstore"`
+	Users        db.Datastore        `spiderweb:"resource=datastore"`
 	RequestBody  *createUserRequest  `spiderweb:"request,mime=application/json"`
 	ResponseBody *createUserResponse `spiderweb:"response,mime=application/json"`
 }
