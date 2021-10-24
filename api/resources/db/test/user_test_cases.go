@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/wspowell/context"
-	"github.com/wspowell/snailmail/resources/user"
+	"github.com/wspowell/snailmail/resources/models/user"
 )
 
 var (

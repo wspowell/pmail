@@ -22,9 +22,10 @@ var (
 // Mailboxes
 var (
 	ErrMailboxGuidExists  = errors.New("db-mailbox-1", "mailbox guid already exists")
-	ErrMailboxFull        = errors.New("db-mailbox-2", "mailbox full")
-	ErrMailboxLabelExists = errors.New("db-mailbox-3", "mailbox label already exists")
-	ErrMailboxNotFound    = errors.New("db-mailbox-4", "mailbox not found")
+	ErrUserMailboxExists  = errors.New("db-mailbox-2", "user mailbox already exists")
+	ErrMailboxFull        = errors.New("db-mailbox-3", "mailbox full")
+	ErrMailboxLabelExists = errors.New("db-mailbox-4", "mailbox label already exists")
+	ErrMailboxNotFound    = errors.New("db-mailbox-5", "mailbox not found")
 )
 
 // In Memory User Database.
@@ -49,6 +50,8 @@ const (
 	icGetUserMailboxGuidNotFound        = "inmemory-mailbox-4"
 	icGetMailboxMailMailboxNotFound     = "inmemory-mailbox-5"
 	icDropOffMailMailboxNotFound        = "inmemory-mailbox-6"
-	icDropOffMailMailboxFull            = "inmemory-mailbox-7"
 	icCreateMailboxLabelConflict        = "inmemory-mailbox-8"
+	icCreateMailboxUserMailboxConflict  = "inmemory-mailbox-9"
+	icPickUpMailUserNotFound            = "inmemory-mailbox-10"
+	icDropOffMailUserNotFound           = "inmemory-mailbox-11"
 )

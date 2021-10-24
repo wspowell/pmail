@@ -9,6 +9,14 @@ import (
 
 type Guid string
 
+func ToStrings(slice []Guid) []string {
+	asStrings := make([]string, len(slice))
+	for index := range slice {
+		asStrings[index] = string(slice[index])
+	}
+	return asStrings
+}
+
 type Mail struct {
 	MailGuid Guid
 	Attributes

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/wspowell/snailmail/api/mailboxes"
+	"github.com/wspowell/snailmail/api/mailboxes/mailboxmail"
 	"github.com/wspowell/snailmail/api/users"
-	"github.com/wspowell/snailmail/api/users/mailbox"
 	"github.com/wspowell/snailmail/resources/db"
 
 	"github.com/wspowell/context"
@@ -16,15 +16,17 @@ import (
 )
 
 func Config() *endpoint.Config {
+	datastore := db.NewInMemory()
+
 	return &endpoint.Config{
-		//Auther:       auth.Noop{},
+		//Auther: userAuth,
 		//ErrorHandler: error_handlers.ErrorJsonWithCodeResponse{},
 		LogConfig: log.NewConfig(log.LevelDebug),
 		//MimeTypeHandlers: endpoint.NewMimeTypeHandlers(),
-		//RequestValidator:  validators.No opRequest{},
+		//RequestValidator:  validators.NoopRequest{},
 		//ResponseValidator: validators.NoopResponse{},
 		Resources: map[string]interface{}{
-			"datastore": db.NewInMemory(),
+			"datastore": datastore,
 		},
 		Timeout: 30 * time.Second,
 	}
@@ -35,8 +37,8 @@ func Routes(server *restful.Server) {
 
 	server.HandleNotFound(config, &noRoute{})
 	users.Routes(server, config)
-	mailbox.Routes(server, config)
 	mailboxes.Routes(server, config)
+	mailboxmail.Routes(server, config)
 }
 
 type noRoute struct{}

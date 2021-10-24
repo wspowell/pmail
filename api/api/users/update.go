@@ -6,8 +6,9 @@ import (
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
-	"github.com/wspowell/snailmail/resources"
+
 	"github.com/wspowell/snailmail/resources/db"
+	"github.com/wspowell/snailmail/resources/models/user"
 )
 
 type updateUserRequest struct {
@@ -15,24 +16,40 @@ type updateUserRequest struct {
 }
 
 type updateUser struct {
-	UserId      uint32             `spiderweb:"path=id"`
-	Users       db.Datastore       `spiderweb:"resource=datastore"`
+	UserGuid    string             `spiderweb:"path=user_guid"`
+	Datastore   db.Datastore       `spiderweb:"resource=datastore"`
 	RequestBody *updateUserRequest `spiderweb:"request,mime=application/json"`
 }
 
 func (self *updateUser) Handle(ctx context.Context) (int, error) {
-	userAttributes := resources.UserAttributes{
-		PineappleOnPizza: self.RequestBody.PineappleOnPizza,
-	}
-
-	if err := self.Users.UpdateUser(ctx, self.UserId, userAttributes); err != nil {
-		if errors.Is(err, resources.ErrUserNotFound) {
-			return http.StatusNotFound, errors.Wrap(icUpdateUserUserNotFound, err)
+	updateUser, err := self.Datastore.GetUser(ctx, user.Guid(self.UserGuid))
+	if err != nil {
+		if errors.Is(err, db.ErrUserNotFound) {
+			return http.StatusNotFound, errors.Propagate(icUpdateUserGetUserNotFound, err)
+		} else if errors.Is(err, db.ErrInternalFailure) {
+			return http.StatusInternalServerError, errors.Propagate(icUpdateUserGetUserDbError, err)
+		} else {
+			return http.StatusInternalServerError, errors.Convert(icUpdateUserGetUserUnknownDbError, err, errUncaughtDbError)
 		}
-		return http.StatusInternalServerError, errors.Wrap(icUpdateUserError, err)
 	}
 
-	log.Debug(ctx, "updated user: %d", self.UserId)
+	updateUser.Attributes = user.Attributes{
+		Username:          updateUser.Username,
+		PineappleOnPizza:  self.RequestBody.PineappleOnPizza,
+		MailCarryCapacity: updateUser.MailCarryCapacity,
+	}
+
+	if err := self.Datastore.UpdateUser(ctx, *updateUser); err != nil {
+		if errors.Is(err, db.ErrUserNotFound) {
+			return http.StatusNotFound, errors.Propagate(icUpdateUserGetUserNotFound, err)
+		} else if errors.Is(err, db.ErrInternalFailure) {
+			return http.StatusInternalServerError, errors.Propagate(icUpdateUserUpdateUserDbError, err)
+		} else {
+			return http.StatusInternalServerError, errors.Convert(icUpdateUserUpdateUserUnknownDbError, err, errUncaughtDbError)
+		}
+	}
+
+	log.Debug(ctx, "updated user: %+v", updateUser)
 
 	return http.StatusOK, nil
 }

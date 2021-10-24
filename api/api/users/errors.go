@@ -1,21 +1,37 @@
 package users
 
-const (
-	icCreateUserError            = "snailmail-users-1"
-	icCreateUserUsernameConflict = "snailmail-users-2"
+import (
+	"github.com/wspowell/errors"
+)
+
+var (
+	errUncaughtDbError = errors.New("snailmail-users-1", "uncaught database error")
 )
 
 const (
-	icGetUserUserNotFound       = "snailmail-users-3"
-	icGetUserGetUserError       = "snailmail-users-4"
-	icGetUserMailboxLookupError = "snailmail-users-5"
+	icCreateUserUserGuidConflict = "snailmail-users-2"
+	icCreateUserUsernameConflict = "snailmail-users-3"
+	icCreateUserDbError          = "snailmail-users-1"
+	icCreateUserUnknownDbError   = "snailmail-users-4"
 )
 
 const (
-	icUpdateUserError        = "snailmail-users-6"
-	icUpdateUserUserNotFound = "snailmail-users-7"
+	icGetUserUserNotFound          = "snailmail-users-4"
+	icGetUserDbError               = "snailmail-users-6"
+	icGetUserUnknownDbError        = "snailmail-users-6"
+	icGetUserMailboxDbError        = "snailmail-users-6"
+	icGetUserMailboxUnknownDbError = "snailmail-users-6"
 )
 
 const (
-	icDeleteUserError = "snailmail-users-8"
+	icUpdateUserGetUserNotFound          = "snailmail-users-7"
+	icUpdateUserGetUserDbError           = "snailmail-users-7"
+	icUpdateUserGetUserUnknownDbError    = "snailmail-users-7"
+	icUpdateUserUpdateUserDbError        = "snailmail-users-7"
+	icUpdateUserUpdateUserUnknownDbError = "snailmail-users-7"
+)
+
+const (
+	icDeleteUserDbError        = "snailmail-users-9"
+	icDeleteUserUnknownDbError = "snailmail-users-9"
 )

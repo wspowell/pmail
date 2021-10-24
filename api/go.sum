@@ -69,8 +69,8 @@ github.com/wspowell/errors v0.2.0 h1:Bl+gELzwl/jodovzyPuV/z0xUuFJxZBXKPBcGMTsKRw
 github.com/wspowell/errors v0.2.0/go.mod h1:LwsgwLFcv0uFAQYSO7kbXnEKx1zCU//y5dnkzYtXvBQ=
 github.com/wspowell/log v0.0.7 h1:wce2Ji1zsCqEccpu1QanZ3VYGoON0uzENQNACvW/P5A=
 github.com/wspowell/log v0.0.7/go.mod h1:WfwCW1zXksDsGikqz8blClO6H4uNRk2vTWkBSSCAVQo=
-github.com/wspowell/spiderweb v0.0.7 h1:qGO0aqRXjPzwz/qaTQ8MFkRhwI8FM9tlfqj+kTNFuJg=
-github.com/wspowell/spiderweb v0.0.7/go.mod h1:oCjFGJqs7ncAY02gMbUFM0fQea9xr6vTItpQGphLyNY=
+github.com/wspowell/spiderweb v0.0.8 h1:VKWR1zKi5v5XYxPb9dl9Efivv9cvkMe57+7/68Wac6s=
+github.com/wspowell/spiderweb v0.0.8/go.mod h1:oCjFGJqs7ncAY02gMbUFM0fQea9xr6vTItpQGphLyNY=
 go.uber.org/atomic v1.9.0 h1:ECmE8Bn/WFTYwEW/bpKD3M8VtR/zQVbavAoalC1PYyE=
 go.uber.org/atomic v1.9.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

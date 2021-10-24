@@ -19,6 +19,7 @@ type Attributes struct {
 	Label string
 
 	// Owner of the mailbox
+	// If owner is blank, then the mailbox is a public exchange mailbox.
 	Owner user.Guid
 
 	// Location in the world.

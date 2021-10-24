@@ -21,8 +21,9 @@ type InMemory struct {
 	usernameToUserGuid map[string]user.Guid
 
 	// Mail
-	mailMutex      *sync.RWMutex
-	mailGuidToMail map[mail.Guid]mail.Mail
+	mailMutex           *sync.RWMutex
+	mailGuidToMail      map[mail.Guid]mail.Mail
+	userGuidToMailGuids map[user.Guid][]mail.Guid
 
 	// Mailboxes
 	mailboxMutex              *sync.RWMutex
@@ -40,8 +41,9 @@ func NewInMemory() *InMemory {
 		usernameToUserGuid: map[string]user.Guid{},
 
 		// Mail
-		mailMutex:      &sync.RWMutex{},
-		mailGuidToMail: map[mail.Guid]mail.Mail{},
+		mailMutex:           &sync.RWMutex{},
+		mailGuidToMail:      map[mail.Guid]mail.Mail{},
+		userGuidToMailGuids: map[user.Guid][]mail.Guid{},
 
 		// Mailboxes
 		mailboxMutex:              &sync.RWMutex{},
@@ -169,6 +171,10 @@ func (self *InMemory) CreateMailbox(ctx context.Context, newMailbox mailbox.Mail
 		return errors.Propagate(icCreateMailboxLabelConflict, ErrMailboxLabelExists)
 	}
 
+	if newMailbox.Owner != "" && self.userMailboxExists(ctx, newMailbox.Owner) {
+		return errors.Propagate(icCreateMailboxUserMailboxConflict, ErrUserMailboxExists)
+	}
+
 	self.mailboxMutex.Lock()
 	self.mailboxGuidToMailbox[newMailbox.MailboxGuid] = newMailbox
 	self.mailboxLabelToMailboxGuid[newMailbox.Label] = newMailbox.MailboxGuid
@@ -211,8 +217,8 @@ func (self *InMemory) GetUserMailbox(ctx context.Context, userGuid user.Guid) (*
 	defer self.mailboxMutex.RUnlock()
 
 	if mailboxGuid, exists := self.userGuidToMailboxGuid[userGuid]; exists {
-		if mail, exists := self.mailboxGuidToMailbox[mailboxGuid]; exists {
-			return &mail, nil
+		if userMailbox, exists := self.mailboxGuidToMailbox[mailboxGuid]; exists {
+			return &userMailbox, nil
 		}
 		return nil, errors.Propagate(icGetUserMailboxGuidNotFound, ErrMailboxNotFound)
 	}
@@ -252,45 +258,91 @@ func (self *InMemory) GetMailboxMail(ctx context.Context, mailboxGuid mailbox.Gu
 	return nil, errors.Propagate(icGetMailboxMailMailboxNotFound, ErrMailboxNotFound)
 }
 
-func (self *InMemory) DropOffMail(ctx context.Context, mailboxGuid mailbox.Guid, mailGuids []mail.Guid) error {
+func (self *InMemory) DropOffMail(ctx context.Context, carrierGuid user.Guid, mailboxGuid mailbox.Guid) ([]mail.Guid, error) {
+	if !self.userGuidExists(ctx, carrierGuid) {
+		return nil, errors.Propagate(icDropOffMailUserNotFound, ErrUserNotFound)
+	}
+
 	mailbox, err := self.GetMailbox(ctx, mailboxGuid)
 	if err != nil {
-		return errors.Propagate(icDropOffMailMailboxNotFound, err)
+		return nil, errors.Propagate(icDropOffMailMailboxNotFound, err)
 	}
 
 	self.mailboxMutex.Lock()
 	defer self.mailboxMutex.Unlock()
 
-	numberOfMail := len(self.mailboxGuidToMailGuids[mailboxGuid])
-	if numberOfMail >= int(mailbox.Capacity) {
-		return errors.Propagate(icDropOffMailMailboxFull, ErrMailboxFull)
+	self.mailMutex.Lock()
+	defer self.mailMutex.Unlock()
+
+	updatedCarrierMail := make([]mail.Guid, 0, len(self.userGuidToMailGuids[carrierGuid]))
+	droppedOffMail := make([]mail.Guid, 0, len(self.userGuidToMailGuids[carrierGuid]))
+	for _, mailGuid := range self.userGuidToMailGuids[carrierGuid] {
+		numberOfMailboxMail := len(self.mailboxGuidToMailGuids[mailboxGuid])
+		if numberOfMailboxMail >= int(mailbox.Capacity) {
+			updatedCarrierMail = append(updatedCarrierMail, mailGuid)
+			continue
+		}
+
+		if mail, exists := self.mailGuidToMail[mailGuid]; exists {
+			if mailbox.Owner != "" && mail.To != mailbox.Owner {
+				updatedCarrierMail = append(updatedCarrierMail, mailGuid)
+				continue
+			}
+
+			mail.Carrier = ""
+			self.mailGuidToMail[mailGuid] = mail
+			self.mailboxGuidToMailGuids[mailboxGuid] = append(self.mailboxGuidToMailGuids[mailboxGuid], mailGuid)
+			droppedOffMail = append(droppedOffMail, mailGuid)
+		}
 	}
 
-	// FIXME: Needs to check for the mail carrier.
+	self.userGuidToMailGuids[carrierGuid] = updatedCarrierMail
 
-	self.mailboxGuidToMailGuids[mailboxGuid] = append(self.mailboxGuidToMailGuids[mailboxGuid], mailGuids...)
-
-	return nil
+	return droppedOffMail, nil
 }
 
-func (self *InMemory) PickUpMail(ctx context.Context, carrier user.Guid, mailboxGuid mailbox.Guid, mailGuids []mail.Guid) error {
+func (self *InMemory) PickUpMail(ctx context.Context, carrierGuid user.Guid, mailboxGuid mailbox.Guid) ([]mail.Guid, error) {
 	if !self.mailboxGuidExists(ctx, mailboxGuid) {
-		return errors.Propagate(icDropOffMailMailboxNotFound, ErrMailboxNotFound)
+		return nil, errors.Propagate(icDropOffMailMailboxNotFound, ErrMailboxNotFound)
 	}
+
+	self.userMutex.RLock()
+	carrierUser, exists := self.userGuidToUser[carrierGuid]
+	if !exists {
+		return nil, errors.Propagate(icPickUpMailUserNotFound, ErrUserNotFound)
+	}
+	self.userMutex.RUnlock()
 
 	self.mailboxMutex.Lock()
 	defer self.mailboxMutex.Unlock()
 
+	self.mailMutex.Lock()
+	defer self.mailMutex.Unlock()
+
+	updatedMailboxMail := make([]mail.Guid, 0, len(self.mailboxGuidToMailGuids[mailboxGuid]))
+	pickedUpMail := make([]mail.Guid, 0, len(self.mailboxGuidToMailGuids[mailboxGuid]))
 	for _, mailGuid := range self.mailboxGuidToMailGuids[mailboxGuid] {
-		self.mailMutex.Lock()
-		if mail, exists := self.mailGuidToMail[mailGuid]; exists {
-			mail.Carrier = carrier
-			self.mailGuidToMail[mailGuid] = mail
+		carrierMail, exists := self.userGuidToMailGuids[carrierGuid]
+		if !exists {
+			self.userGuidToMailGuids[carrierGuid] = []mail.Guid{}
 		}
-		self.mailMutex.Unlock()
+
+		if len(carrierMail) >= int(carrierUser.MailCarryCapacity) {
+			updatedMailboxMail = append(updatedMailboxMail, mailGuid)
+			continue
+		}
+
+		if mail, exists := self.mailGuidToMail[mailGuid]; exists {
+			mail.Carrier = carrierGuid
+			self.mailGuidToMail[mailGuid] = mail
+			self.userGuidToMailGuids[carrierGuid] = append(self.userGuidToMailGuids[carrierGuid], mailGuid)
+			pickedUpMail = append(pickedUpMail, mailGuid)
+		}
 	}
 
-	return nil
+	self.mailboxGuidToMailGuids[mailboxGuid] = updatedMailboxMail
+
+	return pickedUpMail, nil
 }
 
 func (self *InMemory) mailboxGuidExists(ctx context.Context, mailboxGuid mailbox.Guid) bool {
@@ -298,6 +350,14 @@ func (self *InMemory) mailboxGuidExists(ctx context.Context, mailboxGuid mailbox
 	defer self.mailboxMutex.RUnlock()
 
 	_, exists := self.mailboxGuidToMailbox[mailboxGuid]
+	return exists
+}
+
+func (self *InMemory) userMailboxExists(ctx context.Context, userGuid user.Guid) bool {
+	self.mailboxMutex.RLock()
+	defer self.mailboxMutex.RUnlock()
+
+	_, exists := self.userGuidToMailboxGuid[userGuid]
 	return exists
 }
 

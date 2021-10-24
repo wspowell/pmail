@@ -4,6 +4,10 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	DefaultCarryCapacity = 10
+)
+
 type Guid string
 
 type User struct {
@@ -25,4 +29,7 @@ type Attributes struct {
 
 	// PineappleOnPizza is always true, duh.
 	PineappleOnPizza bool
+
+	// MailCarryCapacity limits the amount of mail a single user may carry.
+	MailCarryCapacity uint32
 }

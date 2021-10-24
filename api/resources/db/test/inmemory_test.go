@@ -3,7 +3,7 @@ package db
 import (
 	"testing"
 
-	"github.com/wspowell/snailmail/resources/user"
+	"github.com/wspowell/snailmail/resources/models/user"
 )
 
 func Test_InMemory_user_Api(t *testing.T) {

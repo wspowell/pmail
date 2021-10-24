@@ -3,8 +3,9 @@ package main
 import (
 	"github.com/wspowell/snailmail/api"
 	"github.com/wspowell/snailmail/api/users"
+	"github.com/wspowell/spiderweb/server/lambda"
 )
 
 func main() {
-	users.LambdaUpdate(api.Config()).Start()
+	lambda.New(api.Config(), users.RouteUpdate).Start()
 }

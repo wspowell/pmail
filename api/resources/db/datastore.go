@@ -12,6 +12,7 @@ import (
 type Datastore interface {
 	// CreateUser with given attributes.
 	// Errors:
+	//   * ErrUserGuidExists
 	//   * ErrUsernameExists
 	//   * ErrInternalFailure
 	CreateUser(ctx context.Context, newUser user.User) error
@@ -54,7 +55,8 @@ type Datastore interface {
 
 	// CreateMailbox and place into the world.
 	// Errors:
-	//   * ErrHomeMailboxExists
+	//   * ErrMailboxGuidExists
+	//   * ErrUserMailboxExists
 	//   * ErrMailboxLabelExists
 	//   * ErrInternalFailure
 	CreateMailbox(ctx context.Context, newMailbox mailbox.Mailbox) error
@@ -90,14 +92,12 @@ type Datastore interface {
 	// DropOffMail in a Mailbox.
 	// Errors:
 	//   * ErrMailboxNotFound
-	//   * ErrInsufficientMailboxPermissions
 	//   * ErrInternalFailure
-	DropOffMail(ctx context.Context, mailboxGuid mailbox.Guid, mailGuids []mail.Guid) error
+	DropOffMail(ctx context.Context, carrierGuid user.Guid, mailboxGuid mailbox.Guid) ([]mail.Guid, error)
 
 	// PickUpMail from a Mailbox.
 	// Errors:
 	//   * ErrMailboxNotFound
-	//   * ErrInsufficientMailboxPermissions
 	//   * ErrInternalFailure
-	PickUpMail(ctx context.Context, carrier user.Guid, mailboxGuid mailbox.Guid, mailGuids []mail.Guid) error
+	PickUpMail(ctx context.Context, carrierGuid user.Guid, mailboxGuid mailbox.Guid) ([]mail.Guid, error)
 }

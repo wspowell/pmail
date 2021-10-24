@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/wspowell/snailmail/resources"
+	"github.com/wspowell/snailmail/resources/models/user"
 	"github.com/wspowell/snailmail/server"
 	"github.com/wspowell/snailmail/test/resources/mocks"
 
@@ -18,7 +18,7 @@ func Test_Create(t *testing.T) {
 
 	{
 		userstore := &mocks.UserStore{}
-		userAttributes := resources.UserAttributes{
+		userAttributes := user.Attributes{
 			PineappleOnPizza: true,
 		}
 		userstore.On("CreateUser", mock.Anything, "wpowell", userAttributes).Return(&resources.User{
