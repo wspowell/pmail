@@ -6,6 +6,7 @@ import (
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 
+	"github.com/wspowell/snailmail/middleware"
 	"github.com/wspowell/snailmail/resources/db"
 	"github.com/wspowell/snailmail/resources/models/mail"
 	"github.com/wspowell/snailmail/resources/models/mailbox"
@@ -18,10 +19,10 @@ type createMailboxResponse struct {
 }
 
 type exchangeMail struct {
-	UserGuid     string                 `spiderweb:"query=user_guid"` // FIXME: Move to auth header
-	MailboxGuid  string                 `spiderweb:"path=mailbox_guid"`
-	Datastore    db.Datastore           `spiderweb:"resource=datastore"`
-	ResponseBody *createMailboxResponse `spiderweb:"response,mime=application/json"`
+	AuthorizedUser *middleware.UserAuth   `spiderweb:"auth"`
+	MailboxGuid    string                 `spiderweb:"path=mailbox_guid"`
+	Datastore      db.Datastore           `spiderweb:"resource=datastore"`
+	ResponseBody   *createMailboxResponse `spiderweb:"response,mime=application/json"`
 }
 
 func (self *exchangeMail) Handle(ctx context.Context) (int, error) {
@@ -36,7 +37,7 @@ func (self *exchangeMail) Handle(ctx context.Context) (int, error) {
 		}
 	}
 
-	droppedOffMail, err := self.Datastore.DropOffMail(ctx, user.Guid(self.UserGuid), foundMailbox.MailboxGuid)
+	droppedOffMail, err := self.Datastore.DropOffMail(ctx, user.Guid(self.AuthorizedUser.UserGuid), foundMailbox.MailboxGuid)
 	if err != nil {
 		if errors.Is(err, db.ErrMailboxNotFound) {
 			return http.StatusNotFound, errors.Propagate(icExchangeMailDropOffMailNotFound, err)
@@ -49,8 +50,8 @@ func (self *exchangeMail) Handle(ctx context.Context) (int, error) {
 
 	self.ResponseBody.DroppedOffMail = mail.ToStrings(droppedOffMail)
 
-	if foundMailbox.Owner == "" || foundMailbox.Owner == user.Guid(self.UserGuid) {
-		pickedUpMail, err := self.Datastore.PickUpMail(ctx, user.Guid(self.UserGuid), foundMailbox.MailboxGuid)
+	if foundMailbox.Owner == "" || foundMailbox.Owner == user.Guid(self.AuthorizedUser.UserGuid) {
+		pickedUpMail, err := self.Datastore.PickUpMail(ctx, user.Guid(self.AuthorizedUser.UserGuid), foundMailbox.MailboxGuid)
 		if err != nil {
 			if errors.Is(err, db.ErrMailboxNotFound) {
 				return http.StatusNotFound, errors.Propagate(icExchangeMailPickUpMailNotFound, err)

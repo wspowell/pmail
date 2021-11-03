@@ -19,6 +19,7 @@ type InMemory struct {
 	userMutex          *sync.RWMutex
 	userGuidToUser     map[user.Guid]user.User
 	usernameToUserGuid map[string]user.Guid
+	usernameToPassword map[string]string
 
 	// Mail
 	mailMutex           *sync.RWMutex
@@ -39,6 +40,7 @@ func NewInMemory() *InMemory {
 		userMutex:          &sync.RWMutex{},
 		userGuidToUser:     map[user.Guid]user.User{},
 		usernameToUserGuid: map[string]user.Guid{},
+		usernameToPassword: map[string]string{},
 
 		// Mail
 		mailMutex:           &sync.RWMutex{},
@@ -54,7 +56,7 @@ func NewInMemory() *InMemory {
 	}
 }
 
-func (self *InMemory) CreateUser(ctx context.Context, newUser user.User) error {
+func (self *InMemory) CreateUser(ctx context.Context, newUser user.User, password string) error {
 	if self.userGuidExists(ctx, newUser.UserGuid) {
 		return errors.Propagate(icCreateUserGuidConflict, ErrUserGuidExists)
 	}
@@ -66,6 +68,7 @@ func (self *InMemory) CreateUser(ctx context.Context, newUser user.User) error {
 	self.userMutex.Lock()
 	self.userGuidToUser[newUser.UserGuid] = newUser
 	self.usernameToUserGuid[newUser.Attributes.Username] = newUser.UserGuid
+	self.usernameToPassword[newUser.Username] = password
 	self.userMutex.Unlock()
 
 	return nil
@@ -75,8 +78,23 @@ func (self *InMemory) GetUser(ctx context.Context, userGuid user.Guid) (*user.Us
 	self.userMutex.RLock()
 	defer self.userMutex.RUnlock()
 
-	if user, exists := self.userGuidToUser[userGuid]; exists {
-		return &user, nil
+	if foundUser, exists := self.userGuidToUser[userGuid]; exists {
+		return &foundUser, nil
+	}
+
+	return nil, errors.Propagate(icGetUserUserNotFound, ErrUserNotFound)
+}
+
+func (self *InMemory) AuthUser(ctx context.Context, username string, password string) (*user.User, error) {
+	self.userMutex.RLock()
+	defer self.userMutex.RUnlock()
+
+	if expectedPassword, exists := self.usernameToPassword[username]; exists && expectedPassword == password {
+		if foundUserGuid, exists := self.usernameToUserGuid[username]; exists {
+			if foundUser, exists := self.userGuidToUser[foundUserGuid]; exists {
+				return &foundUser, nil
+			}
+		}
 	}
 
 	return nil, errors.Propagate(icGetUserUserNotFound, ErrUserNotFound)

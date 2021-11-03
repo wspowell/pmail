@@ -1,8 +1,6 @@
 package users
 
 import (
-	"github.com/wspowell/snailmail/middleware"
-	"github.com/wspowell/snailmail/resources/db"
 	"github.com/wspowell/spiderweb/endpoint"
 	"github.com/wspowell/spiderweb/server/restful"
 	"github.com/wspowell/spiderweb/server/route"
@@ -16,11 +14,8 @@ var (
 )
 
 func Routes(server *restful.Server, config *endpoint.Config) {
-	userRouteConfig := *config
-	userRouteConfig.Auther = middleware.NewUserAuth(config.Resources["datastore"].(db.Datastore))
-
-	server.Handle(&userRouteConfig, RouteCreate)
-	server.Handle(&userRouteConfig, RouteGet)
-	server.Handle(&userRouteConfig, RouteUpdate)
-	server.Handle(&userRouteConfig, RouteDelete)
+	server.Handle(config, RouteCreate)
+	server.Handle(config, RouteGet)
+	server.Handle(config, RouteUpdate)
+	server.Handle(config, RouteDelete)
 }

@@ -1,5 +1,6 @@
-package db
+package test
 
+/*
 import (
 	"testing"
 
@@ -12,3 +13,4 @@ func Test_InMemory_user_Api(t *testing.T) {
 
 	test.RunApiTestCases(t, userClient)
 }
+*/

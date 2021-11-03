@@ -18,6 +18,7 @@ type userModel struct {
 
 type createUserRequest struct {
 	userModel
+	Password string `json:"password"`
 }
 
 type createUserResponse struct {
@@ -39,7 +40,7 @@ func (self *createUser) Handle(ctx context.Context) (int, error) {
 
 	newUser := user.NewUser(userAttributes)
 
-	if err := self.Datastore.CreateUser(ctx, newUser); err != nil {
+	if err := self.Datastore.CreateUser(ctx, newUser, self.RequestBody.Password); err != nil {
 		if errors.Is(err, db.ErrUserGuidExists) {
 			return http.StatusConflict, errors.Propagate(icCreateUserUserGuidConflict, err)
 		} else if errors.Is(err, db.ErrUsernameExists) {

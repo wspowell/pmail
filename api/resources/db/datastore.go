@@ -15,13 +15,19 @@ type Datastore interface {
 	//   * ErrUserGuidExists
 	//   * ErrUsernameExists
 	//   * ErrInternalFailure
-	CreateUser(ctx context.Context, newUser user.User) error
+	CreateUser(ctx context.Context, newUser user.User, password string) error
 
 	// GetUser using user GUID.
 	// Errors:
 	//   * ErrUserNotFound
 	//   * ErrInternalFailure
 	GetUser(ctx context.Context, userGuid user.Guid) (*user.User, error)
+
+	// AuthUser using user GUID.
+	// Errors:
+	//   * ErrUserNotFound
+	//   * ErrInternalFailure
+	AuthUser(ctx context.Context, username string, password string) (*user.User, error)
 
 	// DeleteUser using user GUID.
 	// Errors:

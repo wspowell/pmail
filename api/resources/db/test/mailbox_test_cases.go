@@ -1,5 +1,6 @@
-package mailboxtest
+package test
 
+/*
 import (
 	"context"
 	"testing"
@@ -51,3 +52,4 @@ func TestCase_CreateMailbox_new(t *testing.T, mailboxes MailboxStore) {
 	assert.NotEqual(t, 1, mailbox2.Id-mailbox1.Id)
 	assert.NotEqual(t, mailbox1.Id, mailbox2.Id)
 }
+*/

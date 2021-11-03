@@ -1,5 +1,6 @@
-package usertest
+package test
 
+/*
 import (
 	"reflect"
 	"runtime"
@@ -163,3 +164,4 @@ func TestCase_UpdateUser_not_exists(t *testing.T, users user.Api) {
 	err := users.UpdateUser(ctx, user.Guid(uuid.New().String()), newUserAttributes)
 	assert.ErrorIs(t, err, user.ErrNotFound)
 }
+*/

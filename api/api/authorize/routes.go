@@ -1,4 +1,4 @@
-package mailboxmail
+package authorize
 
 import (
 	"github.com/wspowell/spiderweb/endpoint"
@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	RouteExchange = route.Get("/mailboxes/{mailbox_guid}/mail", &exchangeMail{})
+	RouteAuthorizeUser = route.Post("/authorize/user", &authUser{})
 )
 
 func Routes(server *restful.Server, config *endpoint.Config) {
-	server.Handle(config, RouteExchange)
+	server.Handle(config, RouteAuthorizeUser)
 }

@@ -3,12 +3,13 @@ module github.com/wspowell/snailmail
 go 1.17
 
 require (
+	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.7.0
 	github.com/wspowell/context v0.0.6
 	github.com/wspowell/errors v0.2.0
 	github.com/wspowell/log v0.0.7
-	github.com/wspowell/spiderweb v0.0.8
+	github.com/wspowell/spiderweb v0.0.9
 )
 
 require (

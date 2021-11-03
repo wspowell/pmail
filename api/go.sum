@@ -18,6 +18,8 @@ github.com/fasthttp/router v1.4.3 h1:spS+LUnRryQ/+hbmYzs/xWGJlQCkeQI3hxGZdlVYhLU
 github.com/fasthttp/router v1.4.3/go.mod h1:9ytWCfZ5LcCcbD3S7pEXyBX9vZnOZmN918WiiaYUzr8=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
+github.com/golang-jwt/jwt/v4 v4.1.0 h1:XUgk2Ex5veyVFVeLm0xhusUTQybEbexJXrvPNOKkSY0=
+github.com/golang-jwt/jwt/v4 v4.1.0/go.mod h1:/xlHOz8bRuivTWchD4jCa+NbatV+wEUSzwAxVc6locg=
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
 github.com/golang/snappy v0.0.3/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
@@ -69,8 +71,8 @@ github.com/wspowell/errors v0.2.0 h1:Bl+gELzwl/jodovzyPuV/z0xUuFJxZBXKPBcGMTsKRw
 github.com/wspowell/errors v0.2.0/go.mod h1:LwsgwLFcv0uFAQYSO7kbXnEKx1zCU//y5dnkzYtXvBQ=
 github.com/wspowell/log v0.0.7 h1:wce2Ji1zsCqEccpu1QanZ3VYGoON0uzENQNACvW/P5A=
 github.com/wspowell/log v0.0.7/go.mod h1:WfwCW1zXksDsGikqz8blClO6H4uNRk2vTWkBSSCAVQo=
-github.com/wspowell/spiderweb v0.0.8 h1:VKWR1zKi5v5XYxPb9dl9Efivv9cvkMe57+7/68Wac6s=
-github.com/wspowell/spiderweb v0.0.8/go.mod h1:oCjFGJqs7ncAY02gMbUFM0fQea9xr6vTItpQGphLyNY=
+github.com/wspowell/spiderweb v0.0.9 h1:V5QQVWDyeibIDnpXlt57Se90WNGbKpHOJ3HlvlyxT3k=
+github.com/wspowell/spiderweb v0.0.9/go.mod h1:oCjFGJqs7ncAY02gMbUFM0fQea9xr6vTItpQGphLyNY=
 go.uber.org/atomic v1.9.0 h1:ECmE8Bn/WFTYwEW/bpKD3M8VtR/zQVbavAoalC1PYyE=
 go.uber.org/atomic v1.9.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
