@@ -37,6 +37,7 @@ func Config() *endpoint.Config {
 		//MimeTypeHandlers: endpoint.NewMimeTypeHandlers(),
 		//RequestValidator:  validators.NoopRequest{},
 		//ResponseValidator: validators.NoopResponse{},
+
 		Resources: map[string]interface{}{
 			"datastore": datastore,
 			"jwt":       jwtAuth,
