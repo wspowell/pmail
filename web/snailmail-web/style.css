@@ -1,0 +1,30 @@
+a {
+    cursor: pointer;
+}
+
+body {
+    color: black;
+    font-family: system-ui;
+    margin: auto;
+    width: 50%;
+}
+
+header {
+    font-size: xx-large;
+    border-bottom: 1px solid black;
+}
+
+main {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    font-size: medium;
+    
+}
+
+footer {
+    color: burlywood;
+    border-top: 1px solid black;
+    font-size: xx-small;
+}

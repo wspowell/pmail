@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SnailMail</title>
+    <link href="style.css" rel="stylesheet">
+    <meta charset="utf-8">
+
+    <!-- <script src="https://sdk.amazonaws.com/js/aws-sdk-2.861.0.min.js"></script> -->
+    <!-- <script src="cognito.js" type="text/javascript"></script> -->
+    <!-- <script src="google_maps.js" type="text/javascript"></script> -->
+    <script src="storage.js" type="text/javascript"></script>
+    <script src="templating.js" type="text/javascript"></script>
+    <script src="snailmail.js" type="text/javascript"></script>
+    <script src="app.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <header>
+        SnailMail
+    </header>
+    <main id="content"></main>
+    <footer>
+        <table>
+            <tr>
+                <td>Random Software You Did Not Ask For By Wesley Powell</td>
+            </tr>
+        </table>
+    </footer>
+</body>
+
+<template id="login">
+    <div id="info"></div>
+    <table>
+        <tr>
+            <td>Username: </td>
+            <td><input type="text" id="username" name="username"></input></td>
+        </tr>
+        <tr>
+            <td>Password: </td>
+            <td><input type="password" id="password" name="password"></input></td>
+        </tr>
+    </table>
+    <button onclick="SnailMail.AuthorizeUser(getAuthorizeUserData());">Login</button>
+    <table>
+        <tr>
+            <td><a onclick="LoadContent('create_user');">New User?</a></td>
+        </tr>
+    </table>
+</template>
+
+<template id="create_user">
+    <div id="info"></div>
+    <table>
+        <tr>
+            <td>Username: </td>
+            <td><input type="text" id="username" name="username"></input></td>
+        </tr>
+        <tr>
+            <td>Password: </td>
+            <td><input type="password" id="password" name="password"></input></td>
+        </tr>
+        <tr>
+            <td>Pineapple On Pizza?: </td>
+            <td><input type="checkbox" id="pineapple_on_pizza" name="pineapple_on_pizza"></input></td>
+        </tr>
+    </table>
+    <button onclick="SnailMail.CreateUser(getCreateUserData());">Create User</button>
+</template>
+
+<template id="user_info">
+    <div id="info"></div>
+    <table>
+        <tr>
+            <td>UserGuid: </td>
+            <td><span id="UserGuid"></span></td>
+        </tr>
+        <tr>
+            <td>Username: </td>
+            <td><span id="Username"></span></td>
+        </tr>
+        <tr>
+            <td>Pineapple On Pizza?: </td>
+            <td><span id="PineappleOnPizza"></span></td>
+        </tr>
+        <tr>
+            <td>Mail Carry Capacity: </td>
+            <td><span id="MailCarryCapacity"></span></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td><a onclick="Logout();">Logout</a></td>
+        </tr>
+    </table>
+</template>
+
+</html>
