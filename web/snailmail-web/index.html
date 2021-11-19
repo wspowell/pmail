@@ -31,6 +31,7 @@
 
 <template id="login">
     <div id="info"></div>
+    <div id="error"></div>
     <table>
         <tr>
             <td>Username: </td>
@@ -41,16 +42,13 @@
             <td><input type="password" id="password" name="password"></input></td>
         </tr>
     </table>
-    <button onclick="SnailMail.AuthorizeUser(getAuthorizeUserData());">Login</button>
-    <table>
-        <tr>
-            <td><a onclick="LoadContent('create_user');">New User?</a></td>
-        </tr>
-    </table>
+    <button class="accept" onclick="Login();">Login</button>
+    <button class="accept" onclick="ShowCreateUser();">New User?</button>
 </template>
 
 <template id="create_user">
     <div id="info"></div>
+    <div id="error"></div>
     <table>
         <tr>
             <td>Username: </td>
@@ -62,37 +60,89 @@
         </tr>
         <tr>
             <td>Pineapple On Pizza?: </td>
-            <td><input type="checkbox" id="pineapple_on_pizza" name="pineapple_on_pizza"></input></td>
+            <td><input type="checkbox" id="pineapple_on_pizza" name="pineapple_on_pizza" checked="true"></input></td>
         </tr>
     </table>
-    <button onclick="SnailMail.CreateUser(getCreateUserData());">Create User</button>
+    <button class="accept" onclick="CreateUser();">Create User</button>
+    <button class="cancel" onclick="ShowLogin({ error : '...or not, that is fine too <poutyface>'});">Cancel</button>
 </template>
 
 <template id="user_info">
     <div id="info"></div>
+    <div id="error"></div>
     <table>
         <tr>
             <td>UserGuid: </td>
-            <td><span id="UserGuid"></span></td>
+            <td><span id="user_guid"></span></td>
         </tr>
         <tr>
             <td>Username: </td>
-            <td><span id="Username"></span></td>
+            <td><span id="username"></span></td>
         </tr>
         <tr>
             <td>Pineapple On Pizza?: </td>
-            <td><span id="PineappleOnPizza"></span></td>
+            <td><span id="pineapple_on_pizza"></span></td>
         </tr>
         <tr>
             <td>Mail Carry Capacity: </td>
-            <td><span id="MailCarryCapacity"></span></td>
+            <td><span id="mail_carry_capacity"></span></td>
+        </tr>
+        <tr id="user_mailbox">
+            <td colspan="2">
+                <hr />
+                <table>
+                    <caption>Home Mailbox</caption>
+                    <tr>
+                        <td>Mailbox Guid:</td>
+                        <td><span id="mailbox_guid"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Label:</td>
+                        <td><span id="label"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Location:</td>
+                        <td><span id="latitude"></span>, <span id="longitude"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Capacity:</td>
+                        <td><span id="capacity"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Owner:</td>
+                        <td><span id="owner"></span></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr id="create_user_mailbox_button">
+            <td><button class="accept" onclick="ShowCreateUserMailbox();">Create Home Mailbox</button></td>
         </tr>
     </table>
     <table>
+    </table>
+    <button class="cancel" onclick="Logout();">Logout</button>
+</template>
+
+<template id="create_user_mailbox">
+    <div id="info"></div>
+    <div id="error"></div>
+    <table>
         <tr>
-            <td><a onclick="Logout();">Logout</a></td>
+            <td>Label: </td>
+            <td><input type="text" id="label" name="label"></input></td>
+        </tr>
+        <tr>
+            <td>Latitude: </td>
+            <td><input type="text" id="latitude" name="latitude"></input></td>
+        </tr>
+        <tr>
+            <td>Longitude: </td>
+            <td><input type="text" id="longitude" name="longitude"></input></td>
         </tr>
     </table>
+    <button class="accept" onclick="CreateUserMailbox();">Submit</button>
+    <button class="cancel" onclick="ShowProfile();">Cancel</button>
 </template>
 
 </html>

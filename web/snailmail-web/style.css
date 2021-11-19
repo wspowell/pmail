@@ -1,5 +1,14 @@
 a {
     cursor: pointer;
+    color: dodgerblue;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: blueviolet;
 }
 
 body {
@@ -7,6 +16,32 @@ body {
     font-family: system-ui;
     margin: auto;
     width: 50%;
+}
+
+button {
+    cursor: pointer;
+}
+
+button.accept {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+}
+
+button.cancel {
+    background-color: crimson;
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
 }
 
 header {
@@ -18,9 +53,7 @@ main {
     display: block;
     margin-left: auto;
     margin-right: auto;
-
     font-size: medium;
-    
 }
 
 footer {
@@ -28,3 +61,16 @@ footer {
     border-top: 1px solid black;
     font-size: xx-small;
 }
+
+#info {
+    color: limegreen;
+}
+
+#error {
+    color: crimson;
+}
+
+.hidden {
+    display: none;
+}
+

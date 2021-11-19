@@ -7,6 +7,8 @@ if (!'content' in document.createElement('template')) {
 }
 
 function LoadContent(templateId, pageData) {
+    console.debug("loading content '" + templateId + "', data: " + JSON.stringify(pageData ? pageData : {}));
+
     // Instantiate the table with the existing HTML tbody
     // and the row with the template
     var content = document.querySelector("#content");
@@ -15,16 +17,35 @@ function LoadContent(templateId, pageData) {
     // Clone the new row and insert it into the table
     var clone = template.content.cloneNode(true);
 
-    if (pageData != null) {
-        for (const key in pageData) {
-            const node = clone.querySelector("#" + key);
-            node.textContent = pageData[key];
-        }
-    }
+    loadPageData(clone, pageData);
 
     removeAllChildNodes(content);
     content.appendChild(clone);
 }
+
+// UpdateContent that is already loaded into the page.
+function UpdateContent(pageData) {
+    console.debug("updating content, data: " + JSON.stringify(pageData ? pageData : {}));
+
+    loadPageData(document, pageData);
+}
+
+function loadPageData(element, pageData) {
+    if (!pageData) {
+        return;
+    }
+
+    for (const key in pageData) {
+        const node = element.getElementById(key);
+        if (node === null) {
+            console.error("#" + key + " is not a valid element");
+            continue
+        }
+        let objectValue = pageData[key];
+        node.textContent = objectValue;
+    }
+}
+
 
 function removeAllChildNodes(parent) {
     while (parent.firstChild) {

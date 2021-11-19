@@ -2,57 +2,58 @@ var SnailMail = {
     //baseUrl: "https://yrb7f0gokh.execute-api.us-east-1.amazonaws.com/test",
     baseUrl: "http://localhost:8080",
 
-    sendRequest: function (method, path, requestBody, callbacks) {
+    sendRequest: function (method, path, requestBody, callback) {
         const Http = new XMLHttpRequest();
         const url = this.baseUrl + path;
         const body = JSON.stringify(requestBody);
 
-        console.log("sending request -> " + method + " " + url + "\n" + body);
+        console.debug("sending request -> " + method + " " + url + "\n" + (body ? body : "{}"));
 
         let statusCode = 0;
 
-        fetch(url, {
+        const requestData = {
             method: method,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
-            body: body
-        }).then(response => {
+        }
+
+        if (requestBody) {
+            requestData.body = body;
+        }
+
+        fetch(url, requestData).then(response => {
             statusCode = response.status;
-            if (callbacks[statusCode] == null) {
-                throw new Error(method + " " + url + " missing callback for status code " + statusCode);
-            }
             return response.json()
-        }).then(body => {
-            callbacks[statusCode](body)
+        }).then(responseBody => {
+            console.debug("response " + statusCode + " " + JSON.stringify(responseBody));
+            callback(statusCode, responseBody)
         }).catch(error => {
             console.log(error.message)
+            callback(500, error)
+        }).finally(() => {
+            //
         })
     },
 
-    CreateUser: function (requestBody) {
-        this.sendRequest("POST", "/users", requestBody, {
-            201: function (body) {
-                LoadContent("login", { info: "User successfully created! <happyface>" });
-            },
-            409: function (error) {
-                console.log("user conflict: " + error.message);
-                LoadContent("login", { info: "Username already exists <frustratedface>" });
-            },
-        });
+    CreateUser: function (requestBody, callback) {
+        this.sendRequest("POST", "/users", requestBody, callback)
     },
 
-    AuthorizeUser: function (requestBody) {
-        this.sendRequest("POST", "/authorize/user", requestBody, {
-            200: function (body) {
-                storage.SetJwtToken(body.jwt_token);
-                LoadContent("user_info", storage.User());
-            },
-            404: function (error) {
-                console.log("invalid login: " + error.message);
-                LoadContent("login", { info: "Invalid username/password <sadface>" });
-            },
-        });
-    }
+    GetUser: function (userGuid, callback) {
+        this.sendRequest("GET", "/users/" + userGuid, null, callback)
+    },
+
+    AuthorizeUser: function (requestBody, callback) {
+        this.sendRequest("POST", "/authorize/user", requestBody, callback)
+    },
+
+    CreateMailbox: function (requestBody, callback) {
+        this.sendRequest("POST", "/mailboxes", requestBody, callback);
+    },
+
+    GetMailbox: function (mailboxGuid, callback) {
+        this.sendRequest("GET", "/mailboxes/" + mailboxGuid, null, callback)
+    },
 };
