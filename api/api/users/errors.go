@@ -6,6 +6,8 @@ import (
 
 var (
 	errUncaughtDbError = errors.New("snailmail-users-1", "uncaught database error")
+	errInvalidUsername = errors.New("snailmail-users-2", "invalid username")
+	errInvalidPassword = errors.New("snailmail-users-2", "invalid password")
 )
 
 const (
@@ -13,6 +15,8 @@ const (
 	icCreateUserUsernameConflict = "snailmail-users-3"
 	icCreateUserDbError          = "snailmail-users-1"
 	icCreateUserUnknownDbError   = "snailmail-users-4"
+	icCreateUserUsernameBlank    = "snailmail-users-4"
+	icCreateUserPasswordBlank    = "snailmail-users-4"
 )
 
 const (

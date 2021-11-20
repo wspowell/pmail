@@ -6,6 +6,7 @@ import (
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
+	"github.com/wspowell/spiderweb/httpstatus"
 
 	"github.com/wspowell/snailmail/resources/db"
 	"github.com/wspowell/snailmail/resources/models/user"
@@ -32,6 +33,14 @@ type createUser struct {
 }
 
 func (self *createUser) Handle(ctx context.Context) (int, error) {
+	// FIXME: Move to validation.
+	if self.RequestBody.Username == "" {
+		return httpstatus.UnprocessableEntity, errors.Propagate(icCreateUserUsernameBlank, errInvalidUsername)
+	}
+	if self.RequestBody.Password == "" {
+		return httpstatus.UnprocessableEntity, errors.Propagate(icCreateUserPasswordBlank, errInvalidPassword)
+	}
+
 	userAttributes := user.Attributes{
 		PineappleOnPizza:  self.RequestBody.PineappleOnPizza,
 		Username:          self.RequestBody.Username,

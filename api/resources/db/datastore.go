@@ -1,6 +1,8 @@
 package db
 
 import (
+	"time"
+
 	"github.com/wspowell/context"
 
 	"github.com/wspowell/snailmail/resources/models/geo"
@@ -42,8 +44,7 @@ type Datastore interface {
 
 	// CreateMail to send.
 	// Errors:
-	//   * ErrInvalidRecipient
-	//   * ErrEmptyMail
+	//   * ErrMailboxNotFound
 	//   * ErrInternalFailure
 	CreateMail(ctx context.Context, newMail mail.Mail) error
 
@@ -53,6 +54,12 @@ type Datastore interface {
 	//   * ErrMailNotFound
 	//   * ErrInternalFailure
 	GetMail(ctx context.Context, mailGuid mail.Guid) (*mail.Mail, error)
+
+	// GetUserMail for viewing all mail delivered to user and picked up from mailbox.
+	// Errors:
+	//   * ErrUserNotFound
+	//   * ErrInternalFailure
+	GetUserMail(ctx context.Context, userGuid user.Guid) ([]mail.Mail, error)
 
 	// DeleteMail permanently.
 	// Errors:
@@ -72,6 +79,12 @@ type Datastore interface {
 	//   * ErrMailboxNotFound
 	//   * ErrInternalFailure
 	GetMailbox(ctx context.Context, mailboxGuid mailbox.Guid) (*mailbox.Mailbox, error)
+
+	// GetMailbox using the mailbox label.
+	// Errors:
+	//   * ErrMailboxNotFound
+	//   * ErrInternalFailure
+	GetMailboxByLabel(ctx context.Context, mailboxLabel string) (*mailbox.Mailbox, error)
 
 	// DeleteMailbox using the mailbox GUID.
 	// Errors:
@@ -106,4 +119,10 @@ type Datastore interface {
 	//   * ErrMailboxNotFound
 	//   * ErrInternalFailure
 	PickUpMail(ctx context.Context, carrierGuid user.Guid, mailboxGuid mailbox.Guid) ([]mail.Guid, error)
+
+	// OpenMail for the first time.
+	// Errors:
+	//   * ErrMailNotFound
+	//   * ErrInternalFailure
+	OpenMail(ctx context.Context, mailGuid mail.Guid, openedAt time.Time) error
 }

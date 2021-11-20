@@ -15,8 +15,10 @@ var (
 
 // Mail
 var (
-	ErrMailGuidExists = errors.New("db-mail-1", "mail guid already exists")
-	ErrMailNotFound   = errors.New("db-mail-2", "mail not found")
+	ErrMailGuidExists   = errors.New("db-mail-1", "mail guid already exists")
+	ErrInvalidRecipient = errors.New("db-mail-2", "invalid recipient")
+	ErrEmptyMail        = errors.New("db-mail-3", "mail contents empty")
+	ErrMailNotFound     = errors.New("db-mail-4", "mail not found")
 )
 
 // Mailboxes
@@ -38,8 +40,10 @@ const (
 
 // In Memory Mail Database.
 const (
-	icCreateMailGuidConflict = "inmemory-mail-1"
-	icGetMailGuidNotFound    = "inmemory-mail-2"
+	icCreateMailGuidConflict            = "inmemory-mail-1"
+	icGetMailGuidNotFound               = "inmemory-mail-2"
+	icOpenMailGuidNotFound              = "inmemory-mail-3"
+	icCreateMailFromMailboxGuidNotFound = "inmemory-mail-3"
 )
 
 // In Memory Mailbox Database.
@@ -53,5 +57,7 @@ const (
 	icCreateMailboxLabelConflict        = "inmemory-mailbox-8"
 	icCreateMailboxUserMailboxConflict  = "inmemory-mailbox-9"
 	icPickUpMailUserNotFound            = "inmemory-mailbox-10"
-	icDropOffMailUserNotFound           = "inmemory-mailbox-11"
+	icPickUpMailMailboxNotFound         = "inmemory-mailbox-11"
+	icDropOffMailUserNotFound           = "inmemory-mailbox-12"
+	icGetMailboxByLabelLabelNotFound    = "inmemory-mailbox-13"
 )

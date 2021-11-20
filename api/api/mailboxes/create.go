@@ -1,11 +1,10 @@
 package mailboxes
 
 import (
-	"net/http"
-
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/log"
+	"github.com/wspowell/spiderweb/httpstatus"
 
 	"github.com/wspowell/snailmail/resources/db"
 	"github.com/wspowell/snailmail/resources/models/geo"
@@ -45,11 +44,11 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 		// Ensure user exists.
 		if _, err := self.Datastore.GetUser(ctx, user.Guid(self.RequestBody.Owner)); err != nil {
 			if errors.Is(err, db.ErrUserNotFound) {
-				return http.StatusNotFound, errors.Propagate(icCreateMailboxUserNotFound, err)
+				return httpstatus.NotFound, errors.Propagate(icCreateMailboxUserNotFound, err)
 			} else if errors.Is(err, db.ErrInternalFailure) {
-				return http.StatusInternalServerError, errors.Propagate(icCreateMailboxGetUserDbError, err)
+				return httpstatus.InternalServerError, errors.Propagate(icCreateMailboxGetUserDbError, err)
 			} else {
-				return http.StatusInternalServerError, errors.Convert(icCreateMailboxGetUserUnknownDbError, err, errUncaughtDbError)
+				return httpstatus.InternalServerError, errors.Convert(icCreateMailboxGetUserUnknownDbError, err, errUncaughtDbError)
 			}
 		}
 	}
@@ -67,15 +66,15 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 
 	if err := self.Datastore.CreateMailbox(ctx, newMailbox); err != nil {
 		if errors.Is(err, db.ErrMailboxGuidExists) {
-			return http.StatusConflict, errors.Propagate(icCreateMailboxGuidConflict, err)
+			return httpstatus.Conflict, errors.Propagate(icCreateMailboxGuidConflict, err)
 		} else if errors.Is(err, db.ErrUserMailboxExists) {
-			return http.StatusConflict, errors.Propagate(icCreateMailboxUserMailboxConflict, err)
+			return httpstatus.Conflict, errors.Propagate(icCreateMailboxUserMailboxConflict, err)
 		} else if errors.Is(err, db.ErrMailboxLabelExists) {
-			return http.StatusConflict, errors.Propagate(icCreateMailboxLabelConflict, err)
+			return httpstatus.Conflict, errors.Propagate(icCreateMailboxLabelConflict, err)
 		} else if errors.Is(err, db.ErrInternalFailure) {
-			return http.StatusInternalServerError, errors.Propagate(icCreateMailboxDbError, err)
+			return httpstatus.InternalServerError, errors.Propagate(icCreateMailboxDbError, err)
 		} else {
-			return http.StatusInternalServerError, errors.Convert(icCreateMailboxUnknownDbError, err, errUncaughtDbError)
+			return httpstatus.InternalServerError, errors.Convert(icCreateMailboxUnknownDbError, err, errUncaughtDbError)
 		}
 	}
 
@@ -83,5 +82,5 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 
 	self.ResponseBody.MailboxGuid = string(newMailbox.MailboxGuid)
 
-	return http.StatusCreated, nil
+	return httpstatus.Created, nil
 }
