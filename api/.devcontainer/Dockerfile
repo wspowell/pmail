@@ -2,7 +2,7 @@
 
 # [Choice] Go version: 1, 1.16, 1.15
 ARG VARIANT="1"
-FROM mcr.microsoft.com/vscode/devcontainers/go:0-${VARIANT}
+FROM mcr.microsoft.com/vscode/devcontainers/go:0-1.17
 
 # [Option] Install Node.js
 ARG INSTALL_NODE="true"
@@ -43,7 +43,7 @@ RUN ./sam-installation/install
 RUN sam --version
 
 RUN go get github.com/vektra/mockery/v2/.../
-
+RUN go install mvdan.cc/gofumpt@latest
 
 # Install terraform
 RUN sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
