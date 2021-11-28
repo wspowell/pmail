@@ -13,7 +13,7 @@ import (
 )
 
 type mailboxModel struct {
-	Label    string      `json:"label"`
+	Address  string      `json:"address"`
 	Location geoLocation `json:"location"`
 	Capacity uint32      `json:"capacity"`
 	Owner    string      `json:"owner"`
@@ -29,7 +29,7 @@ type createMailboxRequest struct {
 }
 
 type createMailboxResponse struct {
-	MailboxGuid string `json:"mailbox_guid"`
+	MailboxAddress string `json:"mailbox_address"`
 }
 
 // FIXME: This should only allow admins to create non-owned mailboxes.
@@ -54,7 +54,6 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 	}
 
 	attributes := mailbox.Attributes{
-		Label: self.RequestBody.Label,
 		Owner: user.Guid(self.RequestBody.Owner),
 		Location: geo.Coordinate{
 			Lat: geo.Latitude(self.RequestBody.Location.Latitude),
@@ -65,7 +64,7 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 	newMailbox := mailbox.NewMailbox(attributes)
 
 	if err := self.Datastore.CreateMailbox(ctx, newMailbox); err != nil {
-		if errors.Is(err, db.ErrMailboxGuidExists) {
+		if errors.Is(err, db.ErrMailboxAddressExists) {
 			return httpstatus.Conflict, errors.Propagate(icCreateMailboxGuidConflict, err)
 		} else if errors.Is(err, db.ErrUserMailboxExists) {
 			return httpstatus.Conflict, errors.Propagate(icCreateMailboxUserMailboxConflict, err)
@@ -80,7 +79,7 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 
 	log.Debug(ctx, "created mailbox: %+v", newMailbox)
 
-	self.ResponseBody.MailboxGuid = string(newMailbox.MailboxGuid)
+	self.ResponseBody.MailboxAddress = string(newMailbox.Address)
 
 	return httpstatus.Created, nil
 }

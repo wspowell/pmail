@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
@@ -14,7 +15,7 @@ import (
 
 type userModel struct {
 	Username         string `json:"username"`
-	PineappleOnPizza bool   `json:"pineapple_on_pizza"`
+	PineappleOnPizza bool   `json:"pineappleOnPizza"`
 }
 
 type createUserRequest struct {
@@ -23,7 +24,7 @@ type createUserRequest struct {
 }
 
 type createUserResponse struct {
-	UserGuid string `json:"user_guid"`
+	UserGuid string `json:"userGuid"`
 }
 
 type createUser struct {
@@ -45,6 +46,7 @@ func (self *createUser) Handle(ctx context.Context) (int, error) {
 		PineappleOnPizza:  self.RequestBody.PineappleOnPizza,
 		Username:          self.RequestBody.Username,
 		MailCarryCapacity: user.DefaultCarryCapacity,
+		CreatedOn:         time.Now().UTC(),
 	}
 
 	newUser := user.NewUser(userAttributes)

@@ -6,10 +6,8 @@ import (
 	"github.com/wspowell/spiderweb/server/route"
 )
 
-var (
-	RouteAuthorizeUser = route.Post("/authorize/user", &authUser{})
-)
+func RouteAuthorizeUser() route.Route { return route.Post("/authorize/user", &authUser{}) }
 
 func Routes(server *restful.Server, config *endpoint.Config) {
-	server.Handle(config, RouteAuthorizeUser)
+	server.Handle(config, RouteAuthorizeUser())
 }

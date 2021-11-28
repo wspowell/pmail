@@ -1,6 +1,8 @@
 package user
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -11,8 +13,8 @@ const (
 type Guid string
 
 type User struct {
-	UserGuid Guid
 	Attributes
+	UserGuid Guid
 }
 
 func NewUser(attributes Attributes) User {
@@ -23,13 +25,16 @@ func NewUser(attributes Attributes) User {
 }
 
 type Attributes struct {
+	// MailCarryCapacity limits the amount of mail a single user may carry.
+	MailCarryCapacity uint32
+
 	// Username to identity the user.
 	// Must be globally unique.
 	Username string
 
+	// CreatedOn timestamp.
+	CreatedOn time.Time
+
 	// PineappleOnPizza is always true, duh.
 	PineappleOnPizza bool
-
-	// MailCarryCapacity limits the amount of mail a single user may carry.
-	MailCarryCapacity uint32
 }

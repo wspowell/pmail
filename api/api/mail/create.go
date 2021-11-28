@@ -19,7 +19,7 @@ type createMailRequest struct {
 }
 
 type createMailResponse struct {
-	MailGuid string `json:"mail_guid"`
+	MailGuid string `json:"mailGuid"`
 }
 
 type createMail struct {
@@ -34,8 +34,8 @@ func (self *createMail) Handle(ctx context.Context) (int, error) {
 		return httpstatus.UnprocessableEntity, errors.Propagate(icCreateMailEmptyContents, errEmptyContents)
 	}
 
-	// Check that the "to" mailbox code exists.
-	toMailbox, err := self.Datastore.GetMailboxByLabel(ctx, self.RequestBody.To)
+	// Check that the "to" mailbox address exists.
+	toMailbox, err := self.Datastore.GetMailbox(ctx, self.RequestBody.To)
 	if err != nil {
 		if errors.Is(err, db.ErrMailboxNotFound) {
 			return httpstatus.NotFound, errors.Propagate(icCreateMailGetMailboxByLabelMailboxNotFound, err)

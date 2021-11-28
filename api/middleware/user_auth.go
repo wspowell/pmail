@@ -29,8 +29,8 @@ type UserAuth struct {
 	auth.SnailMailClaims
 }
 
-func (self *UserAuth) Authorization(ctx context.Context, PeekHeader func(key string) []byte) (int, error) {
-	authorizationHeaderValue := PeekHeader(httpheader.Authorization)
+func (self *UserAuth) Authorization(ctx context.Context, peekHeader func(key string) []byte) (int, error) {
+	authorizationHeaderValue := peekHeader(httpheader.Authorization)
 	claims, err := JwtAuth.ValidateToken(string(authorizationHeaderValue))
 	if err != nil {
 		if errors.Is(err, auth.ErrTokenInvalid) {
@@ -47,5 +47,5 @@ func (self *UserAuth) Authorization(ctx context.Context, PeekHeader func(key str
 
 	self.SnailMailClaims = *claims
 
-	return httpstatus.OK, err
+	return httpstatus.OK, nil
 }

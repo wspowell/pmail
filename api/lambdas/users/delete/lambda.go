@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	lambda.New(api.Config(), users.RouteDelete).Start()
+	lambda.New(api.Config(), users.RouteDelete()).Start()
 }

@@ -6,14 +6,12 @@ import (
 	"github.com/wspowell/spiderweb/server/route"
 )
 
-var (
-	RouteCreate = route.Post("/mail", &createMail{})
-	RouteList   = route.Get("/mail", &listMail{})
-	RouteOpen   = route.Get("/mail/{mail_guid}", &openMail{})
-)
+func RouteCreate() route.Route { return route.Post("/mail", &createMail{}) }
+func RouteList() route.Route   { return route.Get("/mail", &listMail{}) }
+func RouteOpen() route.Route   { return route.Get("/mail/{mail_guid}", &openMail{}) }
 
 func Routes(server *restful.Server, config *endpoint.Config) {
-	server.Handle(config, RouteCreate)
-	server.Handle(config, RouteList)
-	server.Handle(config, RouteOpen)
+	server.Handle(config, RouteCreate())
+	server.Handle(config, RouteList())
+	server.Handle(config, RouteOpen())
 }

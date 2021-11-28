@@ -13,7 +13,7 @@ import (
 
 type getUserResponse struct {
 	userModel
-	MailboxGuid string `json:"mailbox_guid,omitempty"`
+	MailboxAddress string `json:"mailboxAddress,omitempty"`
 }
 
 type getUser struct {
@@ -44,7 +44,7 @@ func (self *getUser) Handle(ctx context.Context) (int, error) {
 			return http.StatusInternalServerError, errors.Convert(icGetUserMailboxUnknownDbError, err, errUncaughtDbError)
 		}
 	} else {
-		self.ResponseBody.MailboxGuid = string(userMailbox.MailboxGuid)
+		self.ResponseBody.MailboxAddress = userMailbox.Address
 	}
 
 	self.ResponseBody.userModel.Username = foundUser.Username

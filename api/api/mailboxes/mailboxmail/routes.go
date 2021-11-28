@@ -6,10 +6,8 @@ import (
 	"github.com/wspowell/spiderweb/server/route"
 )
 
-var (
-	RouteExchange = route.Get("/mailboxes/{mailbox_guid}/mail", &exchangeMail{})
-)
+func RouteExchange() route.Route { return route.Get("/mailboxes/{mailbox_guid}/mail", &exchangeMail{}) }
 
 func Routes(server *restful.Server, config *endpoint.Config) {
-	server.Handle(config, RouteExchange)
+	server.Handle(config, RouteExchange())
 }

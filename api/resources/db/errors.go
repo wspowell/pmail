@@ -23,11 +23,15 @@ var (
 
 // Mailboxes
 var (
-	ErrMailboxGuidExists  = errors.New("db-mailbox-1", "mailbox guid already exists")
-	ErrUserMailboxExists  = errors.New("db-mailbox-2", "user mailbox already exists")
-	ErrMailboxFull        = errors.New("db-mailbox-3", "mailbox full")
-	ErrMailboxLabelExists = errors.New("db-mailbox-4", "mailbox label already exists")
-	ErrMailboxNotFound    = errors.New("db-mailbox-5", "mailbox not found")
+	ErrMailboxAddressExists = errors.New("db-mailbox-1", "mailbox guid already exists")
+	ErrUserMailboxExists    = errors.New("db-mailbox-2", "user mailbox already exists")
+	ErrMailboxFull          = errors.New("db-mailbox-3", "mailbox full")
+	ErrMailboxLabelExists   = errors.New("db-mailbox-4", "mailbox label already exists")
+	ErrMailboxNotFound      = errors.New("db-mailbox-5", "mailbox not found")
+)
+
+const (
+	icAuthUserUserNotFound = "inmemory-auth-1"
 )
 
 // In Memory User Database.
@@ -40,18 +44,17 @@ const (
 
 // In Memory Mail Database.
 const (
-	icCreateMailGuidConflict            = "inmemory-mail-1"
-	icGetMailGuidNotFound               = "inmemory-mail-2"
-	icOpenMailGuidNotFound              = "inmemory-mail-3"
-	icCreateMailFromMailboxGuidNotFound = "inmemory-mail-3"
+	icCreateMailGuidConflict = "inmemory-mail-1"
+	icGetMailGuidNotFound    = "inmemory-mail-2"
+	icOpenMailGuidNotFound   = "inmemory-mail-3"
 )
 
 // In Memory Mailbox Database.
 const (
-	icCreateMailboxGuidConflict         = "inmemory-mailbox-1"
-	icGetMailboxGuidNotFound            = "inmemory-mailbox-2"
+	icCreateMailboxAddressConflict      = "inmemory-mailbox-1"
+	icGetMailboxAddressNotFound         = "inmemory-mailbox-2"
 	icGetUserMailboxUserMailboxNotFound = "inmemory-mailbox-3"
-	icGetUserMailboxGuidNotFound        = "inmemory-mailbox-4"
+	icGetUserMailboxAddressNotFound     = "inmemory-mailbox-4"
 	icGetMailboxMailMailboxNotFound     = "inmemory-mailbox-5"
 	icDropOffMailMailboxNotFound        = "inmemory-mailbox-6"
 	icCreateMailboxLabelConflict        = "inmemory-mailbox-8"
@@ -60,4 +63,16 @@ const (
 	icPickUpMailMailboxNotFound         = "inmemory-mailbox-11"
 	icDropOffMailUserNotFound           = "inmemory-mailbox-12"
 	icGetMailboxByLabelLabelNotFound    = "inmemory-mailbox-13"
+)
+
+// MySql Database.
+const (
+	icConnectFailure = "mysql-connect-1"
+)
+
+const (
+	icMigrateInitError           = "mysql-migrate-1"
+	icMigrateUpError             = "mysql-migrate-1"
+	icMigrateNewInstanceError    = "mysql-migrate-1"
+	icMigrateCreateDatabaseError = "mysql-migrate-1"
 )

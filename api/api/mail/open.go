@@ -14,15 +14,15 @@ import (
 )
 
 type mailResponse struct {
-	MailGuid string `json:"mail_guid"`
+	MailGuid string `json:"mailGuid"`
 
 	From     string `json:"from"`
 	To       string `json:"to"`
 	Contents string `json:"contents"`
 
-	SentOn      time.Time `json:"sent_on"`
-	DeliveredOn time.Time `json:"delivered_on"`
-	OpenedOn    time.Time `json:"opened_on"`
+	SentOn      time.Time `json:"sentOn"`
+	DeliveredOn time.Time `json:"deliveredOn"`
+	OpenedOn    time.Time `json:"openedOn"`
 }
 
 type getMailResponse struct {

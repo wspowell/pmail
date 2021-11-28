@@ -9,24 +9,23 @@ import (
 	"github.com/wspowell/snailmail/middleware"
 	"github.com/wspowell/snailmail/resources/db"
 	"github.com/wspowell/snailmail/resources/models/mail"
-	"github.com/wspowell/snailmail/resources/models/mailbox"
 	"github.com/wspowell/snailmail/resources/models/user"
 )
 
 type createMailboxResponse struct {
-	DroppedOffMail []string `json:"dropped_off_mail_guids"`
-	PickedUpMail   []string `json:"picked_up_mail_guids"`
+	DroppedOffMailGuids []string `json:"droppedOffMailGuids"`
+	PickedUpMailGuids   []string `json:"pickedUpMailGuids"`
 }
 
 type exchangeMail struct {
 	AuthorizedUser *middleware.UserAuth   `spiderweb:"auth"`
-	MailboxGuid    string                 `spiderweb:"path=mailbox_guid"`
+	MailboxAddress string                 `spiderweb:"path=mailbox_address"`
 	Datastore      db.Datastore           `spiderweb:"resource=datastore"`
 	ResponseBody   *createMailboxResponse `spiderweb:"response,mime=application/json"`
 }
 
 func (self *exchangeMail) Handle(ctx context.Context) (int, error) {
-	foundMailbox, err := self.Datastore.GetMailbox(ctx, mailbox.Guid(self.MailboxGuid))
+	foundMailbox, err := self.Datastore.GetMailbox(ctx, self.MailboxAddress)
 	if err != nil {
 		if errors.Is(err, db.ErrMailboxNotFound) {
 			return http.StatusNotFound, errors.Propagate(icExchangeMailGetMailboxNotFound, err)
@@ -37,7 +36,7 @@ func (self *exchangeMail) Handle(ctx context.Context) (int, error) {
 		}
 	}
 
-	droppedOffMail, err := self.Datastore.DropOffMail(ctx, user.Guid(self.AuthorizedUser.UserGuid), foundMailbox.MailboxGuid)
+	droppedOffMail, err := self.Datastore.DropOffMail(ctx, user.Guid(self.AuthorizedUser.UserGuid), foundMailbox.Address)
 	if err != nil {
 		if errors.Is(err, db.ErrMailboxNotFound) {
 			return http.StatusNotFound, errors.Propagate(icExchangeMailDropOffMailNotFound, err)
@@ -48,10 +47,10 @@ func (self *exchangeMail) Handle(ctx context.Context) (int, error) {
 		}
 	}
 
-	self.ResponseBody.DroppedOffMail = mail.ToStrings(droppedOffMail)
+	self.ResponseBody.DroppedOffMailGuids = mail.ToStrings(droppedOffMail)
 
 	if foundMailbox.Owner == "" || foundMailbox.Owner == user.Guid(self.AuthorizedUser.UserGuid) {
-		pickedUpMail, err := self.Datastore.PickUpMail(ctx, user.Guid(self.AuthorizedUser.UserGuid), foundMailbox.MailboxGuid)
+		pickedUpMail, err := self.Datastore.PickUpMail(ctx, user.Guid(self.AuthorizedUser.UserGuid), foundMailbox.Address)
 		if err != nil {
 			if errors.Is(err, db.ErrMailboxNotFound) {
 				return http.StatusNotFound, errors.Propagate(icExchangeMailPickUpMailNotFound, err)
@@ -62,7 +61,7 @@ func (self *exchangeMail) Handle(ctx context.Context) (int, error) {
 			}
 		}
 
-		self.ResponseBody.PickedUpMail = mail.ToStrings(pickedUpMail)
+		self.ResponseBody.PickedUpMailGuids = mail.ToStrings(pickedUpMail)
 	}
 
 	return http.StatusOK, nil

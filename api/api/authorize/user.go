@@ -18,7 +18,7 @@ type jwtRequest struct {
 }
 
 type jwtResponse struct {
-	JwtToken string `json:"jwt_token"`
+	JwtToken string `json:"jwtToken"`
 }
 
 type userTokener interface {

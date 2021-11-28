@@ -12,7 +12,7 @@ import (
 )
 
 type updateUserRequest struct {
-	PineappleOnPizza bool `json:"pineapple_on_pizza"`
+	PineappleOnPizza bool `json:"pineappleOnPizza"`
 }
 
 type updateUser struct {

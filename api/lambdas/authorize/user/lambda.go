@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	lambda.New(api.Config(), authorize.RouteAuthorizeUser).Start()
+	lambda.New(api.Config(), authorize.RouteAuthorizeUser()).Start()
 }

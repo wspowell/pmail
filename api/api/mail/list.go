@@ -33,20 +33,19 @@ func (self *listMail) Handle(ctx context.Context) (int, error) {
 	}
 
 	self.ResponseBody.Mail = []mailResponse{}
-	for _, mailItem := range userMail {
+	for index := range userMail {
 		mailResponseItem := mailResponse{
-			MailGuid:    string(mailItem.MailGuid),
-			From:        string(mailItem.From),
-			To:          string(mailItem.To),
-			Contents:    mailItem.Contents,
-			SentOn:      mailItem.SentOn,
-			DeliveredOn: mailItem.DeliveredOn,
-			OpenedOn:    mailItem.OpenedOn,
+			MailGuid:    string(userMail[index].MailGuid),
+			From:        string(userMail[index].From),
+			To:          string(userMail[index].To),
+			Contents:    userMail[index].Contents,
+			SentOn:      userMail[index].SentOn,
+			DeliveredOn: userMail[index].DeliveredOn,
+			OpenedOn:    userMail[index].OpenedOn,
 		}
 
 		self.ResponseBody.Mail = append(self.ResponseBody.Mail, mailResponseItem)
 	}
 
 	return httpstatus.OK, nil
-
 }

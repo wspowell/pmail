@@ -68,7 +68,7 @@ type Datastore interface {
 
 	// CreateMailbox and place into the world.
 	// Errors:
-	//   * ErrMailboxGuidExists
+	//   * ErrMailboxAddressExists
 	//   * ErrUserMailboxExists
 	//   * ErrMailboxLabelExists
 	//   * ErrInternalFailure
@@ -78,18 +78,12 @@ type Datastore interface {
 	// Errors:
 	//   * ErrMailboxNotFound
 	//   * ErrInternalFailure
-	GetMailbox(ctx context.Context, mailboxGuid mailbox.Guid) (*mailbox.Mailbox, error)
-
-	// GetMailbox using the mailbox label.
-	// Errors:
-	//   * ErrMailboxNotFound
-	//   * ErrInternalFailure
-	GetMailboxByLabel(ctx context.Context, mailboxLabel string) (*mailbox.Mailbox, error)
+	GetMailbox(ctx context.Context, mailboxAddress string) (*mailbox.Mailbox, error)
 
 	// DeleteMailbox using the mailbox GUID.
 	// Errors:
 	//   * ErrInternalFailure
-	DeleteMailbox(ctx context.Context, mailboxGuid mailbox.Guid) error
+	DeleteMailbox(ctx context.Context, mailboxAddress string) error
 
 	// GetUserMailbox using the user GUID.
 	// Errors:
@@ -100,25 +94,25 @@ type Datastore interface {
 	// GetNearbyMailboxes using coordinates.
 	// Errors:
 	//   * ErrInternalFailure
-	GetNearbyMailboxes(ctx context.Context, location geo.Coordinate, radiusMeters uint32) ([]mailbox.Mailbox, error)
+	GetNearbyMailboxes(ctx context.Context, location geo.Coordinate, radiusMeters float32) ([]mailbox.Mailbox, error)
 
 	// GetMailboxMail stored in the mailbox.
 	// Errors:
 	//   * ErrMailboxNotFound
 	//   * ErrInternalFailure
-	GetMailboxMail(ctx context.Context, mailboxGuid mailbox.Guid) ([]mail.Mail, error)
+	GetMailboxMail(ctx context.Context, mailboxAddress string) ([]mail.Mail, error)
 
 	// DropOffMail in a Mailbox.
 	// Errors:
 	//   * ErrMailboxNotFound
 	//   * ErrInternalFailure
-	DropOffMail(ctx context.Context, carrierGuid user.Guid, mailboxGuid mailbox.Guid) ([]mail.Guid, error)
+	DropOffMail(ctx context.Context, carrierGuid user.Guid, mailboxAddress string) ([]mail.Guid, error)
 
 	// PickUpMail from a Mailbox.
 	// Errors:
 	//   * ErrMailboxNotFound
 	//   * ErrInternalFailure
-	PickUpMail(ctx context.Context, carrierGuid user.Guid, mailboxGuid mailbox.Guid) ([]mail.Guid, error)
+	PickUpMail(ctx context.Context, carrierGuid user.Guid, mailboxAddress string) ([]mail.Guid, error)
 
 	// OpenMail for the first time.
 	// Errors:
