@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/wspowell/snailmail/resources/models/user"
 )
 
@@ -14,6 +15,7 @@ func ToStrings(slice []Guid) []string {
 	for index := range slice {
 		asStrings[index] = string(slice[index])
 	}
+
 	return asStrings
 }
 

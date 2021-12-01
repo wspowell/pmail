@@ -1,18 +1,19 @@
 package middleware
 
 import (
-	"github.com/wspowell/snailmail/resources/auth"
-
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/spiderweb/httpheader"
 	"github.com/wspowell/spiderweb/httpstatus"
+
+	"github.com/wspowell/snailmail/resources/auth"
 )
 
 const (
-	icMiddlewareInvalidToken     = "middleware-auth-1"
-	icMiddlewareExpiredToken     = "middleware-auth-2"
-	icMiddlewareUnknownAuthError = "middleware-auth-3"
+	icMiddlewareUnknownAuthError = "middleware-auth-1"
+	icMiddlewareInvalidToken     = "middleware-auth-2"
+	icMiddlewareExpiredToken     = "middleware-auth-3"
+	icMiddlewareTooEarly         = "middleware-auth-4"
 )
 
 var (
@@ -22,6 +23,7 @@ var (
 )
 
 var (
+	// nolint:gochecknoglobals // reason: spiderweb currently requires this to be a global
 	JwtAuth auth.Jwt
 )
 
@@ -39,7 +41,7 @@ func (self *UserAuth) Authorization(ctx context.Context, peekHeader func(key str
 		} else if errors.Is(err, auth.ErrTokenExpired) {
 			return httpstatus.Unauthorized, errors.Convert(icMiddlewareExpiredToken, err, ErrExpiredToken)
 		} else if errors.Is(err, auth.ErrTokenTooEarly) {
-			return httpstatus.Unauthorized, errors.Convert(icMiddlewareExpiredToken, err, ErrTooEarly)
+			return httpstatus.Unauthorized, errors.Convert(icMiddlewareTooEarly, err, ErrTooEarly)
 		} else {
 			return httpstatus.InternalServerError, errors.Convert(icMiddlewareUnknownAuthError, err, ErrUserUnauthorized)
 		}

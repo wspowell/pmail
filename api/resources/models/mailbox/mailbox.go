@@ -28,11 +28,15 @@ type Attributes struct {
 	Capacity uint32
 }
 
-const letterBytes = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const (
+	addressCharLength = 12
+	letterBytes       = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+)
 
 func randStringBytes(n int) string {
 	b := make([]byte, n)
 	for i := range b {
+		// nolint:gosec // reason: no need for this to be secure
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 
@@ -42,7 +46,7 @@ func randStringBytes(n int) string {
 func NewMailbox(attributes Attributes) Mailbox {
 	return Mailbox{
 		// 599,555,620,984,320,000 permutations (36 character set, sets of 12)
-		Address:    randStringBytes(12),
+		Address:    randStringBytes(addressCharLength),
 		Attributes: attributes,
 	}
 }

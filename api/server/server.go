@@ -4,8 +4,9 @@ import (
 	"time"
 
 	"github.com/wspowell/log"
-	"github.com/wspowell/snailmail/api"
 	"github.com/wspowell/spiderweb/server/restful"
+
+	"github.com/wspowell/snailmail/api"
 )
 
 func New() *restful.Server {

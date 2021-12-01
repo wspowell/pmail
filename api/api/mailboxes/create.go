@@ -29,7 +29,7 @@ type createMailboxRequest struct {
 }
 
 type createMailboxResponse struct {
-	MailboxAddress string `json:"mailbox_address"`
+	MailboxAddress string `json:"mailboxAddress"`
 }
 
 // FIXME: This should only allow admins to create non-owned mailboxes.
@@ -79,7 +79,7 @@ func (self *createMailbox) Handle(ctx context.Context) (int, error) {
 
 	log.Debug(ctx, "created mailbox: %+v", newMailbox)
 
-	self.ResponseBody.MailboxAddress = string(newMailbox.Address)
+	self.ResponseBody.MailboxAddress = newMailbox.Address
 
 	return httpstatus.Created, nil
 }

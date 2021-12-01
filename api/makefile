@@ -1,6 +1,10 @@
 build:
 	go build ./...
 
+test: build
+	golangci-lint run
+	go test ./...
+
 lambda:
 	go build -o authorize_user ./lambdas/authorize/user
 

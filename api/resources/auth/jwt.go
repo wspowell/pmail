@@ -5,38 +5,42 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wspowell/errors"
+
+	"github.com/wspowell/snailmail/resources/aws"
 	"github.com/wspowell/snailmail/resources/models/user"
 )
 
 const (
-	icTokenSignFailure  = "auth-jwt-1"
-	icTokenParseFailure = "auth-jwt-2"
-	icInvalidToken      = "auth-jwt-3"
-	icTokenExpired      = "auth-jwt-4"
-	icTokenEarly        = "auth-jwt-5"
+	icTokenParseFailure = "auth-jwt-1"
+	icTokenSignFailure  = "auth-jwt-2"
 )
 
 var (
-	ErrTokenInvalid  = errors.New(icInvalidToken, "invalid token")
-	ErrTokenExpired  = errors.New(icTokenExpired, "token expired")
-	ErrTokenTooEarly = errors.New(icTokenEarly, "token too early")
-)
-
-var (
-	// TODO: Retrieve secret key from somewhere safe.
-	signingKey = []byte("tempkey")
+	ErrTokenInvalid     = errors.New("jwt-1", "invalid token")
+	ErrTokenExpired     = errors.New("jwt-2", "token expired")
+	ErrTokenTooEarly    = errors.New("jwt-3", "token too early")
+	ErrJwtSecretFailure = errors.New("jwt-4", "failed getting JWT signing key")
 )
 
 func GetSigningKey() ([]byte, error) {
-	return signingKey, nil
+	var jwtSignature jwtSigningKey
+	if err := aws.GetSecret(&jwtSignature); err != nil {
+		return nil, ErrJwtSecretFailure
+	}
+
+	return []byte(jwtSignature.Key), nil
+}
+
+type jwtSigningKey struct {
+	Key string `env:"JWT_SIGNING_KEY" json:"key"`
 }
 
 type SnailMailClaims struct {
 	jwt.RegisteredClaims
-	UserGuid          string `json:"user_guid"`
+	UserGuid          string `json:"userGuid"`
 	Username          string `json:"username"`
-	MailCarryCapacity uint32 `json:"mail_carry_capacity"`
-	PineappleOnPizza  bool   `json:"pineapple_on_pizza"`
+	MailCarryCapacity uint32 `json:"mailCarryCapacity"`
+	PineappleOnPizza  bool   `json:"pineappleOnPizza"`
 }
 
 type Group string
@@ -51,6 +55,7 @@ func groupClaims(groups ...Group) jwt.ClaimStrings {
 	for index := range groups {
 		claims[index] = string(groups[index])
 	}
+
 	return claims
 }
 

@@ -16,8 +16,7 @@ const (
 	icCreateUserDbError          = "snailmail-users-1"
 	icCreateUserUnknownDbError   = "snailmail-users-4"
 	icCreateUserUsernameBlank    = "snailmail-users-4"
-	// nolint:gosec // reason: not a password
-	icCreateUserPasswordBlank = "snailmail-users-4"
+	icCreateUserPasswordBlank    = "snailmail-users-4"
 )
 
 const (

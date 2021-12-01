@@ -1,11 +1,52 @@
 # options for analysis running
 run:
   # default concurrency is a available CPU number
-  concurrency: 8
+  #concurrency: 16
 
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 1m
 
+  # Allow multiple parallel golangci-lint instances running.
+  # If false (default) - golangci-lint acquires file lock on start.
+  allow-parallel-runners: true
+
+linters:
+  enable-all: true
+  disable:
+    - golint
+    - interfacer
+    - maligned
+    - scopelint
+    - forbidigo
+    - gofumpt
+    - exhaustivestruct
+    - godox
+    - gomodguard
+    - gomoddirectives
+    - importas
+    - gofumpt
+    - goheader
+    - godot
+    - gocognit
+    - gocyclo
+    - gomnd
+    - lll
+    - funlen
+    - nestif
+    - wsl
+    - cyclop
+  fast: false
+
+severity:
+  # Default value is empty string.
+  # Set the default severity for issues. If severity rules are defined and the issues
+  # do not match or no severity is provided to the rule this will be the default
+  # severity applied. Severities should match the supported severity names of the
+  # selected out format.
+  # - Code climate: https://docs.codeclimate.com/docs/issues#issue-severity
+  # -   Checkstyle: https://checkstyle.sourceforge.io/property_types.html#severity
+  # -       GitHub: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
+  default-severity: error
 
 linters-settings:
   bidichk:
@@ -140,6 +181,7 @@ linters-settings:
       - typedeffirst
       - typeswitchvar
       - typeunparen
+      - underef
       - unlabelstmt
       - unnamedresult
       - unnecessaryblock
@@ -157,12 +199,9 @@ linters-settings:
       captLocal: # must be valid enabled check name
         # whether to restrict checker to params only (default true)
         paramsOnly: true
-      elseif:
-        # whether to skip balanced if-else pairs (default true)
-        skipBalanced: true
       hugeParam:
         # size in bytes that makes the warning trigger (default 80)
-        sizeThreshold: 80
+        sizeThreshold: 500
       rangeExprCopy:
         # size in bytes that makes the warning trigger (default 512)
         sizeThreshold: 512
@@ -193,15 +232,6 @@ linters-settings:
     # it's a comma-separated list of prefixes
     local-prefixes: github.com/wspowell/snailmail
 
-  gomnd:
-    settings:
-      mnd:
-        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
-        checks: argument,case,condition,operation,return,assign
-        # ignored-numbers: 1000
-        # ignored-files: magic_.*.go
-        # ignored-functions: math.*
-
   gomoddirectives:
     # Allow local `replace` directives. Default is false.
     replace-local: false
@@ -217,7 +247,7 @@ linters-settings:
     # To select a subset of rules to run.
     # Available rules: https://github.com/securego/gosec#available-rules
     includes:
-      - G101
+      #- G101 # This is super annoying.
       - G102
       - G103
       - G104
@@ -518,39 +548,3 @@ linters-settings:
     ignorePackageGlobs:
         - encoding/*
         - github.com/pkg/*
-
-linters:
-  enable-all: true
-  disable:
-    - golint
-    - interfacer
-    - maligned
-    - scopelint
-    - forbidigo
-    - gofumpt
-    - exhaustivestruct
-    - godox
-    - gomodguard
-    - gomoddirectives
-    - importas
-    - gofumpt
-    - goheader
-    - godot
-    - gocognit
-    - gocyclo
-    - lll
-    - funlen
-    - nestif
-    - wsl
-    - cyclop
-
-severity:
-  # Default value is empty string.
-  # Set the default severity for issues. If severity rules are defined and the issues
-  # do not match or no severity is provided to the rule this will be the default
-  # severity applied. Severities should match the supported severity names of the
-  # selected out format.
-  # - Code climate: https://docs.codeclimate.com/docs/issues#issue-severity
-  # -   Checkstyle: https://checkstyle.sourceforge.io/property_types.html#severity
-  # -       GitHub: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
-  default-severity: error

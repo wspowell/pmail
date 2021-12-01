@@ -20,10 +20,7 @@ const (
 )
 
 const (
-	icGetMailboxNotFound            = "snailmail-mailbox-5"
-	icGetMailboxDbError             = "snailmail-mailbox-5"
-	icGetMailboxUnknownDbError      = "snailmail-mailbox-5"
-	icGetMailboxMailMailboxNotFound = "snailmail-mailbox-5"
-	icGetMailboxMailDbError         = "snailmail-mailbox-5"
-	icGetMailboxMailUnknownDbError  = "snailmail-mailbox-5"
+	icGetMailboxNotFound       = "snailmail-mailbox-5"
+	icGetMailboxDbError        = "snailmail-mailbox-5"
+	icGetMailboxUnknownDbError = "snailmail-mailbox-5"
 )

@@ -1,17 +1,17 @@
-package users
+package users_test
 
 /*
 import (
 	"net/http"
 	"testing"
 
-	"github.com/wspowell/snailmail/resources/models/user"
-	"github.com/wspowell/snailmail/server"
-	"github.com/wspowell/snailmail/test/resources/mocks"
-
 	"github.com/stretchr/testify/mock"
 	"github.com/wspowell/errors"
 	"github.com/wspowell/spiderweb/server/restful/restfultest"
+
+	"github.com/wspowell/snailmail/resources/models/user"
+	"github.com/wspowell/snailmail/server"
+	"github.com/wspowell/snailmail/test/resources/mocks"
 )
 
 func Test_Create(t *testing.T) {

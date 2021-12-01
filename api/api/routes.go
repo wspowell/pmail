@@ -27,15 +27,14 @@ func Config() *endpoint.Config {
 	ctx := context.Local()
 	ctx = log.WithContext(ctx, log.NewConfig(log.LevelDebug))
 
-	//datastore := db.NewInMemory()
 	datastore := db.NewMySql()
 
 	var err error
 
-	if err := datastore.Connect(); err != nil {
+	if err = datastore.Connect(); err != nil {
 		log.Fatal(ctx, "%v", err)
 	}
-	if err := datastore.Migrate(); err != nil {
+	if err = datastore.Migrate(); err != nil {
 		log.Fatal(ctx, "%v", err)
 	}
 
