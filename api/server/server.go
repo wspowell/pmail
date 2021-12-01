@@ -12,7 +12,7 @@ import (
 func New() *restful.Server {
 	serverConfig := &restful.ServerConfig{
 		LogConfig:    log.NewConfig(log.LevelDebug),
-		Host:         "localhost",
+		Host:         "0.0.0.0",
 		Port:         8080,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,

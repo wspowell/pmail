@@ -33,8 +33,12 @@ RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/comp
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
 
+ENV GOPATH=/app/api
+
 RUN apt update
 RUN apt install -y graphviz vim unzip make 
+
+RUN sudo apt install whois
 
 RUN mkdir -p /temp && cd /temp
 RUN wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
@@ -46,10 +50,10 @@ RUN go get github.com/vektra/mockery/v2/.../
 RUN go install mvdan.cc/gofumpt@latest
 
 # Install terraform
-RUN sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
-RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-RUN sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-RUN sudo apt-get update && sudo apt-get install terraform
+# RUN sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+# RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+# RUN sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+# RUN sudo apt-get update && sudo apt-get install terraform
 
 #ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
 #CMD [ "sleep", "infinity" ]

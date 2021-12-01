@@ -57,12 +57,10 @@ const (
 	icGetUserMailboxAddressNotFound     = "inmemory-mailbox-4"
 	icGetMailboxMailMailboxNotFound     = "inmemory-mailbox-5"
 	icDropOffMailMailboxNotFound        = "inmemory-mailbox-6"
-	icCreateMailboxLabelConflict        = "inmemory-mailbox-8"
-	icCreateMailboxUserMailboxConflict  = "inmemory-mailbox-9"
-	icPickUpMailUserNotFound            = "inmemory-mailbox-10"
-	icPickUpMailMailboxNotFound         = "inmemory-mailbox-11"
-	icDropOffMailUserNotFound           = "inmemory-mailbox-12"
-	icGetMailboxByLabelLabelNotFound    = "inmemory-mailbox-13"
+	icCreateMailboxUserMailboxConflict  = "inmemory-mailbox-7"
+	icPickUpMailUserNotFound            = "inmemory-mailbox-8"
+	icPickUpMailMailboxNotFound         = "inmemory-mailbox-9"
+	icDropOffMailUserNotFound           = "inmemory-mailbox-10"
 )
 
 // MySql Database.
@@ -71,8 +69,11 @@ const (
 )
 
 const (
-	icMigrateInitError           = "mysql-migrate-1"
-	icMigrateUpError             = "mysql-migrate-1"
-	icMigrateNewInstanceError    = "mysql-migrate-1"
-	icMigrateCreateDatabaseError = "mysql-migrate-1"
+	icMigrateInitError        = "mysql-migrate-1"
+	icMigrateUpError          = "mysql-migrate-2"
+	icMigrateNewInstanceError = "mysql-migrate-3"
+)
+
+const (
+	icCreateUserRandSeedError = "mysql-user-1"
 )

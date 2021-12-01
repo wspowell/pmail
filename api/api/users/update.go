@@ -16,7 +16,7 @@ type updateUserRequest struct {
 }
 
 type updateUser struct {
-	UserGuid    string             `spiderweb:"path=user_guid"`
+	UserGuid    string             `spiderweb:"path=userGsuid"`
 	Datastore   db.Datastore       `spiderweb:"resource=datastore"`
 	RequestBody *updateUserRequest `spiderweb:"request,mime=application/json"`
 }

@@ -3,6 +3,8 @@ package auth
 import (
 	"time"
 
+	"github.com/wspowell/context"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wspowell/errors"
 
@@ -22,9 +24,9 @@ var (
 	ErrJwtSecretFailure = errors.New("jwt-4", "failed getting JWT signing key")
 )
 
-func GetSigningKey() ([]byte, error) {
+func GetSigningKey(ctx context.Context) ([]byte, error) {
 	var jwtSignature jwtSigningKey
-	if err := aws.GetSecret(&jwtSignature); err != nil {
+	if err := aws.GetSecret(ctx, &jwtSignature); err != nil {
 		return nil, ErrJwtSecretFailure
 	}
 
@@ -32,7 +34,7 @@ func GetSigningKey() ([]byte, error) {
 }
 
 type jwtSigningKey struct {
-	Key string `env:"JWT_SIGNING_KEY" json:"key"`
+	Key string `json:"key"`
 }
 
 type SnailMailClaims struct {

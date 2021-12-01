@@ -31,7 +31,7 @@ func Config() *endpoint.Config {
 
 	var err error
 
-	if err = datastore.Connect(); err != nil {
+	if err = datastore.Connect(ctx); err != nil {
 		log.Fatal(ctx, "%v", err)
 	}
 	if err = datastore.Migrate(); err != nil {
@@ -51,115 +51,129 @@ func Config() *endpoint.Config {
 
 	// Setup test data.
 
-	err = datastore.CreateUser(ctx, user.User{
-		UserGuid: user.Guid("abc-123"),
-		Attributes: user.Attributes{
-			Username:          "test1",
-			PineappleOnPizza:  true,
-			MailCarryCapacity: 20,
-		},
-	}, "a")
-	if err != nil {
-		panic(err)
-	}
+	if false {
+		password, err := auth.Password(ctx, "a")
+		if err != nil {
+			panic(err)
+		}
 
-	err = datastore.CreateMailbox(ctx, mailbox.Mailbox{
-		Address: "AAAAAAAAAAAA",
-		Attributes: mailbox.Attributes{
-			Owner: user.Guid("abc-123"),
-			Location: geo.Coordinate{
-				Lat: 88.8,
-				Lng: 99.9,
+		err = datastore.CreateUser(ctx, user.User{
+			UserGuid: user.Guid("abc-123"),
+			Attributes: user.Attributes{
+				Username:          "test1",
+				PineappleOnPizza:  true,
+				MailCarryCapacity: 20,
+				CreatedOn:         time.Now().UTC(),
 			},
-			Capacity: 20,
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
+		}, password)
+		if err != nil {
+			panic(err)
+		}
 
-	err = datastore.CreateUser(ctx, user.User{
-		UserGuid: user.Guid("cba-321"),
-		Attributes: user.Attributes{
-			Username:          "test2",
-			PineappleOnPizza:  true,
-			MailCarryCapacity: 20,
-		},
-	}, "a")
-	if err != nil {
-		panic(err)
-	}
-
-	err = datastore.CreateMailbox(ctx, mailbox.Mailbox{
-		Address: "BBBBBBBBBBBB",
-		Attributes: mailbox.Attributes{
-			Owner: user.Guid("cba-321"),
-			Location: geo.Coordinate{
-				Lat: 11.1,
-				Lng: 22.2,
+		err = datastore.CreateMailbox(ctx, mailbox.Mailbox{
+			Address: "AAAAAAAAAAAA",
+			Attributes: mailbox.Attributes{
+				Owner: user.Guid("abc-123"),
+				Location: geo.Coordinate{
+					Lat: 88.8,
+					Lng: 99.9,
+				},
+				Capacity: 20,
 			},
-			Capacity: 20,
-		},
-	})
-	if err != nil {
-		panic(err)
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		password, err = auth.Password(ctx, "a")
+		if err != nil {
+			panic(err)
+		}
+
+		err = datastore.CreateUser(ctx, user.User{
+			UserGuid: user.Guid("cba-321"),
+			Attributes: user.Attributes{
+				Username:          "test2",
+				PineappleOnPizza:  true,
+				MailCarryCapacity: 20,
+				CreatedOn:         time.Now().UTC(),
+			},
+		}, password)
+		if err != nil {
+			panic(err)
+		}
+
+		err = datastore.CreateMailbox(ctx, mailbox.Mailbox{
+			Address: "BBBBBBBBBBBB",
+			Attributes: mailbox.Attributes{
+				Owner: user.Guid("cba-321"),
+				Location: geo.Coordinate{
+					Lat: 11.1,
+					Lng: 22.2,
+				},
+				Capacity: 20,
+			},
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		err = datastore.CreateMail(ctx, mailm.Mail{
+			MailGuid: "mail-123",
+			Attributes: mailm.Attributes{
+				From:     "cba-321",
+				To:       "abc-123",
+				Contents: "Hello there!",
+			},
+			SentOn:      time.Now().UTC().Add(-3 * time.Hour),
+			DeliveredOn: time.Now().UTC().Add(-2 * time.Hour),
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		err = datastore.CreateMail(ctx, mailm.Mail{
+			MailGuid: "mail-123-2",
+			Attributes: mailm.Attributes{
+				From:     "cba-321",
+				To:       "abc-123",
+				Contents: "Greetings!",
+			},
+			SentOn:      time.Now().UTC().Add(-6 * time.Hour),
+			DeliveredOn: time.Now().UTC().Add(-5 * time.Hour),
+			OpenedOn:    time.Now().UTC().Add(-4 * time.Hour),
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		err = datastore.CreateMail(ctx, mailm.Mail{
+			MailGuid: "mail-123-3",
+			Attributes: mailm.Attributes{
+				From:     "cba-321",
+				To:       "abc-123",
+				Contents: "Why wont you answer?",
+			},
+			SentOn:      time.Now().UTC().Add(-6 * time.Hour),
+			DeliveredOn: time.Now().UTC().Add(-5 * time.Hour),
+			OpenedOn:    time.Now().UTC().Add(-4 * time.Hour),
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = datastore.DropOffMail(ctx, user.Guid("cba-321"), "AAAAAAAAAAAA")
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = datastore.PickUpMail(ctx, user.Guid("abc-123"), "AAAAAAAAAAAA")
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	err = datastore.CreateMail(ctx, mailm.Mail{
-		MailGuid: "mail-123",
-		Attributes: mailm.Attributes{
-			From:     "cba-321",
-			To:       "abc-123",
-			Contents: "Hello there!",
-		},
-		SentOn:      time.Now().UTC().Add(-3 * time.Hour),
-		DeliveredOn: time.Now().UTC().Add(-2 * time.Hour),
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	err = datastore.CreateMail(ctx, mailm.Mail{
-		MailGuid: "mail-123-2",
-		Attributes: mailm.Attributes{
-			From:     "cba-321",
-			To:       "abc-123",
-			Contents: "Greetings!",
-		},
-		SentOn:      time.Now().UTC().Add(-6 * time.Hour),
-		DeliveredOn: time.Now().UTC().Add(-5 * time.Hour),
-		OpenedOn:    time.Now().UTC().Add(-4 * time.Hour),
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	err = datastore.CreateMail(ctx, mailm.Mail{
-		MailGuid: "mail-123-3",
-		Attributes: mailm.Attributes{
-			From:     "cba-321",
-			To:       "abc-123",
-			Contents: "Why wont you answer?",
-		},
-		SentOn:      time.Now().UTC().Add(-6 * time.Hour),
-		DeliveredOn: time.Now().UTC().Add(-5 * time.Hour),
-		OpenedOn:    time.Now().UTC().Add(-4 * time.Hour),
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = datastore.DropOffMail(ctx, user.Guid("cba-321"), "AAAAAAAAAAAA")
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = datastore.PickUpMail(ctx, user.Guid("abc-123"), "AAAAAAAAAAAA")
-	if err != nil {
-		panic(err)
-	}
-
-	signingKey, err := auth.GetSigningKey()
+	signingKey, err := auth.GetSigningKey(ctx)
 	if err != nil {
 		// FIXME: Need to add Context() to restful.Server
 		log.NewLog(log.NewConfig(log.LevelError)).Fatal("failed to get jwt signing key: %s", err)

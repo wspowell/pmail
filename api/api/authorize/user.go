@@ -8,6 +8,7 @@ import (
 	"github.com/wspowell/log"
 	"github.com/wspowell/spiderweb/httpstatus"
 
+	"github.com/wspowell/snailmail/resources/auth"
 	"github.com/wspowell/snailmail/resources/db"
 	"github.com/wspowell/snailmail/resources/models/user"
 )
@@ -33,7 +34,12 @@ type authUser struct {
 }
 
 func (self *authUser) Handle(ctx context.Context) (int, error) {
-	authedUser, err := self.Datastore.AuthUser(ctx, self.RequestBody.Username, self.RequestBody.Password)
+	password, err := auth.Password(ctx, self.RequestBody.Password)
+	if err != nil {
+		return http.StatusInternalServerError, errors.Propagate(icAuthUserPasswordError, err)
+	}
+
+	authedUser, err := self.Datastore.AuthUser(ctx, self.RequestBody.Username, password)
 	if err != nil {
 		if errors.Is(err, db.ErrUserNotFound) {
 			return httpstatus.NotFound, errors.Propagate(icAuthUserUserNotFound, err)

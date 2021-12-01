@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS `snailmail`;
+CREATE DATABASE IF NOT EXISTS `snailmail`;

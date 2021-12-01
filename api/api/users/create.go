@@ -9,6 +9,7 @@ import (
 	"github.com/wspowell/log"
 	"github.com/wspowell/spiderweb/httpstatus"
 
+	"github.com/wspowell/snailmail/resources/auth"
 	"github.com/wspowell/snailmail/resources/db"
 	"github.com/wspowell/snailmail/resources/models/user"
 )
@@ -51,7 +52,12 @@ func (self *createUser) Handle(ctx context.Context) (int, error) {
 
 	newUser := user.NewUser(userAttributes)
 
-	if err := self.Datastore.CreateUser(ctx, newUser, self.RequestBody.Password); err != nil {
+	password, err := auth.Password(ctx, self.RequestBody.Password)
+	if err != nil {
+		return http.StatusInternalServerError, errors.Propagate(icCreateUserPasswordError, err)
+	}
+
+	if err := self.Datastore.CreateUser(ctx, newUser, password); err != nil {
 		if errors.Is(err, db.ErrUserGuidExists) {
 			return http.StatusConflict, errors.Propagate(icCreateUserUserGuidConflict, err)
 		} else if errors.Is(err, db.ErrUsernameExists) {

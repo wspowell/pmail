@@ -14,4 +14,5 @@ const (
 	icAuthUserDbError        = "snailmail-auth-2"
 	icAuthUserUnknownDbError = "snailmail-auth-3"
 	icAuthUserJwtError       = "snailmail-auth-4"
+	icAuthUserPasswordError  = "snailmail-auth-5"
 )

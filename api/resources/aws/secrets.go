@@ -12,7 +12,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/caarlos0/env/v6"
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
+	"github.com/wspowell/log"
 )
 
 const (
@@ -34,16 +36,20 @@ const (
 // GetSecret from either local environment or from AWS SecretsManager.
 // AWS secret name is derived from the app name and struct name: <app>-<struct>
 //   Example: snailmail-rdsConnectionInfo
-func GetSecret(secretModel interface{}) error {
+func GetSecret(ctx context.Context, secretModel interface{}) error {
 	if environment := os.Getenv("ENV"); environment == "dev" {
 		// Default to using env var.
 		// Useful for local development.
 		if err := env.Parse(secretModel); err != nil {
 			return errors.Propagate(icEnvParseError, err)
 		}
+
+		return nil
 	}
 
-	secretName := appName + "-" + reflect.TypeOf(secretModel).Name()
+	secretName := appName + "-" + getTypeName(secretModel)
+
+	log.Debug(ctx, "secretName=%s", secretName)
 
 	// Create a Secrets Manager client
 	sess, err := session.NewSession()
@@ -116,4 +122,13 @@ func GetSecret(secretModel interface{}) error {
 	}
 
 	return nil
+}
+
+func getTypeName(value interface{}) string {
+	valueType := reflect.TypeOf(value)
+	for valueType.Kind() == reflect.Ptr {
+		valueType = valueType.Elem()
+	}
+
+	return valueType.Name()
 }

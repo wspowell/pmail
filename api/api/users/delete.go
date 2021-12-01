@@ -12,7 +12,7 @@ import (
 )
 
 type deleteUser struct {
-	UserGuid  string       `spiderweb:"path=user_guid"`
+	UserGuid  string       `spiderweb:"path=userGuid"`
 	Datastore db.Datastore `spiderweb:"resource=datastore"`
 }
 
