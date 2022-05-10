@@ -11,8 +11,11 @@
             "mode": "debug",
             "program": "${workspaceFolder}",
             "env": {
-                "ENV": "dev"
+                "GOGC": "3000",
+                "ENV": "aws",
+                //"ENV": "dev"
             }
+            //,"buildFlags": "-tags release"
         }
     ]
 }

@@ -22,30 +22,25 @@ const (
 	region  = "us-east-1"
 )
 
-const (
-	icEnvParseError = "env-secrets-1"
-)
-
-const (
-	icAwsNewSessionError       = "aws-secrets-1"
-	icAwsGetSecretValueError   = "aws-secrets-2"
-	icSecretBase64DecodeError  = "aws-secrets-3"
-	icSecretJsonUnmarshalError = "aws-secrets-4"
-)
-
 // GetSecret from either local environment or from AWS SecretsManager.
 // AWS secret name is derived from the app name and struct name: <app>-<struct>
 //   Example: snailmail-rdsConnectionInfo
 func GetSecret(ctx context.Context, secretModel interface{}) error {
-	if environment := os.Getenv("ENV"); environment == "dev" {
+	log.Debug(ctx, "getting secret: %T", secretModel)
+
+	if environment, exists := os.LookupEnv("ENV"); exists && environment == "dev" {
+		log.Debug(ctx, "dev mode, getting secret from environment")
+
 		// Default to using env var.
 		// Useful for local development.
 		if err := env.Parse(secretModel); err != nil {
-			return errors.Propagate(icEnvParseError, err)
+			return err
 		}
 
 		return nil
 	}
+
+	log.Debug(ctx, "getting secret from SecretsManager")
 
 	secretName := appName + "-" + getTypeName(secretModel)
 
@@ -55,7 +50,7 @@ func GetSecret(ctx context.Context, secretModel interface{}) error {
 	sess, err := session.NewSession()
 	if err != nil {
 		// Handle session creation error
-		return errors.Propagate(icAwsNewSessionError, err)
+		return err
 	}
 	svc := secretsmanager.New(sess,
 		aws.NewConfig().WithRegion(region))
@@ -98,7 +93,7 @@ func GetSecret(ctx context.Context, secretModel interface{}) error {
 			fmt.Println(err.Error())
 		}
 
-		return errors.Propagate(icAwsGetSecretValueError, err)
+		return err
 	}
 
 	// Decrypts secret using the associated KMS CMK.
@@ -112,13 +107,13 @@ func GetSecret(ctx context.Context, secretModel interface{}) error {
 		if err != nil {
 			fmt.Println("Base64 Decode Error:", err)
 
-			return errors.Propagate(icSecretBase64DecodeError, err)
+			return err
 		}
 		secretString = string(decodedBinarySecretBytes[:length])
 	}
 
 	if err := json.Unmarshal([]byte(secretString), &secretModel); err != nil {
-		return errors.Propagate(icSecretJsonUnmarshalError, err)
+		return err
 	}
 
 	return nil

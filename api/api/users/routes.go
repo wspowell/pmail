@@ -1,19 +1,46 @@
 package users
 
 import (
-	"github.com/wspowell/spiderweb/endpoint"
+	"time"
+
+	"github.com/wspowell/snailmail/resources"
+	"github.com/wspowell/spiderweb/handler"
+	"github.com/wspowell/spiderweb/httpmethod"
+	"github.com/wspowell/spiderweb/request"
 	"github.com/wspowell/spiderweb/server/restful"
-	"github.com/wspowell/spiderweb/server/route"
 )
 
-func RouteCreate() route.Route { return route.Post("/users", &createUser{}) }
-func RouteGet() route.Route    { return route.Get("/users/{userGuid}", &getUser{}) }
-func RouteUpdate() route.Route { return route.Put("/users/{userGuid}", &updateUser{}) }
-func RouteDelete() route.Route { return route.Delete("/users/{userGuid}", &deleteUser{}) }
+func RouteCreate(apiResources *resources.Resources) (string, string, *handler.Handle) {
+	return httpmethod.Post, "/users", handler.NewHandle(createUser{Datastore: apiResources.Datastore}).
+		WithLogConfig(apiResources.LogConfig)
+}
+func RouteGet(apiResources *resources.Resources) (string, string, *handler.Handle) {
+	return httpmethod.Get, "/users/{userGuid}", handler.NewHandle(getUser{Datastore: apiResources.Datastore}).
+		WithETag(30 * time.Second).
+		WithLogConfig(apiResources.LogConfig)
+}
+func RouteUpdate(apiResources *resources.Resources) (string, string, *handler.Handle) {
+	return httpmethod.Put, "/users/{userGuid}", handler.NewHandle(updateUser{Datastore: apiResources.Datastore}).
+		WithLogConfig(apiResources.LogConfig)
+}
+func RouteDelete(apiResources *resources.Resources) (string, string, *handler.Handle) {
+	return httpmethod.Delete, "/users/{userGuid}", handler.NewHandle(deleteUser{Datastore: apiResources.Datastore}).
+		WithLogConfig(apiResources.LogConfig)
+}
 
-func Routes(server *restful.Server, config *endpoint.Config) {
-	server.Handle(config, RouteCreate())
-	server.Handle(config, RouteGet())
-	server.Handle(config, RouteUpdate())
-	server.Handle(config, RouteDelete())
+func Routes(server *restful.Server, apiResources *resources.Resources) {
+	server.Handle(RouteCreate(apiResources))
+	server.Handle(RouteGet(apiResources))
+	//server.Handle(RouteUpdate(apiResources))
+	server.Handle(RouteDelete(apiResources))
+}
+
+type pathParams struct {
+	UserGuid string
+}
+
+func (self *pathParams) PathParameters() []request.Parameter {
+	return []request.Parameter{
+		request.NewParam("userGuid", &self.UserGuid),
+	}
 }

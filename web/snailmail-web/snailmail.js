@@ -19,6 +19,10 @@ var SnailMail = {
             },
         }
 
+        if (storage.LoggedIn()) {
+            requestData.headers["Authorization"] = storage.JwtToken();
+        }
+
         if (requestBody) {
             requestData.body = body;
         }
@@ -55,5 +59,13 @@ var SnailMail = {
 
     GetMailbox: function (mailboxGuid, callback) {
         this.sendRequest("GET", "/mailboxes/" + mailboxGuid, null, callback)
+    },
+
+    ListMail: function (callback) {
+        this.sendRequest("GET", "/mail", null, callback)
+    },
+
+    OpenMail: function (mailGuid, callback) {
+        this.sendRequest("GET", "/mail/" + mailGuid, null, callback)
     },
 };

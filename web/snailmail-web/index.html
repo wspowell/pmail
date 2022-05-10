@@ -19,6 +19,11 @@
     <header>
         SnailMail
     </header>
+    <nav id="navigation" class="hidden">
+        <button class="nav" onclick="ShowProfile();">Profile</button>
+        <button class="nav" onclick="ShowMail();">Mail</button>
+        <button class="nav" onclick="Logout();">Logout</button>
+    </nav>
     <main id="content"></main>
     <footer>
         <table>
@@ -28,6 +33,10 @@
         </table>
     </footer>
 </body>
+
+<template id="navigation">
+
+</template>
 
 <template id="login">
     <div id="info"></div>
@@ -121,7 +130,6 @@
     </table>
     <table>
     </table>
-    <button class="cancel" onclick="Logout();">Logout</button>
 </template>
 
 <template id="create_user_mailbox">
@@ -143,6 +151,44 @@
     </table>
     <button class="accept" onclick="CreateUserMailbox();">Submit</button>
     <button class="cancel" onclick="ShowProfile();">Cancel</button>
+</template>
+
+<template id="mail">
+    <div id="info"></div>
+    <div id="error"></div>
+    <table id="inbox">
+        <thead>
+            <tr>
+                <th>
+                    <!-- read/unread indicator -->
+                </th>
+                <th>From</th>
+                <th>Sent</th>
+                <th>Delivered</th>
+                <th>Body</th>
+            </tr>
+        </thead>
+        <tbody id="mailrows"></tbody>
+    </table>
+</template>
+
+<template id="mailrow">
+    <tr id="mailitem">
+        <td></td>
+        <td><span id="from"></span></td>
+        <td><span id="sent"></span></td>
+        <td><span id="delivered"></span></td>
+    </tr>
+</template>
+
+<template id="mailviewer">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td id="mail_contents_display"></td>
+    </tr>
 </template>
 
 </html>

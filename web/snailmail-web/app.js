@@ -22,11 +22,23 @@ window.onload = function () {
     }
 };
 
+function navBar(show) {
+    const navigation = document.getElementById("navigation");
+    if (show) {
+        navigation.classList.remove("hidden");
+    } else {
+        navigation.classList.add("hidden");
+    }
+}
+
 function ShowLogin(pageData) {
+    window.location.hash = "#login";
+    navBar(false);
     LoadContent("login", pageData);
 }
 
 function ShowCreateUser() {
+    window.location.hash = "#signup";
     LoadContent("create_user");
 }
 
@@ -55,7 +67,7 @@ function Login() {
 
 function Logout() {
     storage.Logout();
-    LoadContent('login');
+    ShowLogin();
 }
 
 function CreateUser() {
@@ -73,6 +85,9 @@ function CreateUser() {
             case 409:
                 UpdateContent({ error: "Username already exists <frustratedface>" });
                 break;
+            case 422:
+                UpdateContent({ error: "Invalid username and/or password <frustratedface>" });
+                break;
             case 500:
             default:
                 UpdateContent({ error: "Server slipped on a banana <surprisedface>" });
@@ -82,6 +97,9 @@ function CreateUser() {
 }
 
 function ShowProfile() {
+    window.location.hash = "#profile";
+    navBar(true);
+
     let userGuid = storage.UserGuid();
     let user = storage.User();
     let userMailbox = storage.UserMailbox();
@@ -192,6 +210,79 @@ function CreateUserMailbox() {
                 break;
             case 409:
                 UpdateContent({ error: "Mailbox already exists <confusedface>" });
+                break;
+            case 500:
+            default:
+                UpdateContent({ error: "Server slipped on a banana <surprisedface>" });
+        }
+    });
+}
+
+function ShowMail() {
+    window.location.hash = "#mail";
+    navBar(true);
+    LoadContent("mail");
+
+    SnailMail.ListMail(function (statusCode, responseBody) {
+        switch (statusCode) {
+            case 200:
+                const mailrows = document.getElementById("mailrows");
+
+                const mailViewer = GetTemplate("mailviewer");
+                mailViewer.getElementById("mail_contents_display").setAttribute("rowspan", responseBody.mail.length + 1);
+                InsertTemplate(mailrows, mailViewer);
+
+                for (const mailIndex in responseBody.mail) {
+                    const mail = responseBody.mail[mailIndex];
+                    const mailRow = GetTemplate("mailrow");
+
+                    const mailitem = mailRow.getElementById("mailitem");
+                    const from = mailRow.getElementById("from");
+                    const sent = mailRow.getElementById("sent");
+                    const delivered = mailRow.getElementById("delivered");
+
+                    mailitem.setAttribute("id", "mail_guid-" + mail.mail_guid);
+                    mailitem.setAttribute("onclick", "OpenMail('" + mail.mail_guid + "');");
+                    from.removeAttribute("id");
+                    sent.removeAttribute("id");
+                    delivered.removeAttribute("id");
+
+                    if (mail.opened_on == "0001-01-01T00:00:00Z") {
+                        mailitem.classList.add("unread");
+                    }
+
+                    from.textContent = mail.from;
+                    sent.textContent = mail.sent_on;
+                    delivered.textContent = mail.delivered_on;
+
+                    InsertTemplate(mailrows, mailRow);
+                }
+
+                break;
+            case 404:
+                UpdateContent({ error: "User not found <confusedface>" });
+                break;
+            case 500:
+            default:
+                UpdateContent({ error: "Server slipped on a banana <surprisedface>" });
+        }
+    });
+}
+
+function OpenMail(mailGuid) {
+    document.getElementById("mail_guid-" + mailGuid).classList.remove("unread");
+
+    const mailDisplay = document.getElementById("mail_contents_display");
+    mailDisplay.textContent = "loading...";
+
+    SnailMail.OpenMail(mailGuid, function (statusCode, responseBody) {
+        switch (statusCode) {
+            case 200:
+
+                mailDisplay.textContent = responseBody.contents;
+                break;
+            case 404:
+                UpdateContent({ error: "User not found <confusedface>" });
                 break;
             case 500:
             default:

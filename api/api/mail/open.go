@@ -5,76 +5,63 @@ import (
 
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
+	"github.com/wspowell/spiderweb/body"
 	"github.com/wspowell/spiderweb/httpstatus"
+	"github.com/wspowell/spiderweb/mime"
 
-	"github.com/wspowell/snailmail/middleware"
+	"github.com/wspowell/snailmail/resources/auth"
 	"github.com/wspowell/snailmail/resources/db"
-	"github.com/wspowell/snailmail/resources/models/mail"
-	"github.com/wspowell/snailmail/resources/models/user"
 )
 
-type mailResponse struct {
+type openMailResponse struct {
+	mime.Json
+
 	MailGuid string `json:"mailGuid"`
 
-	From     string `json:"from"`
-	To       string `json:"to"`
-	Contents string `json:"contents"`
+	FromMailboxAddress string `json:"fromMailboxAddress"`
+	ToMailboxAddress   string `json:"toMailboxAddress"`
+
+	From string `json:"from"`
+	To   string `json:"to"`
+	Body string `json:"body"`
 
 	SentOn      time.Time `json:"sentOn"`
 	DeliveredOn time.Time `json:"deliveredOn"`
 	OpenedOn    time.Time `json:"openedOn"`
 }
 
-type getMailResponse struct {
-	mailResponse
-}
-
 type openMail struct {
-	AuthorizedUser *middleware.UserAuth `spiderweb:"auth"`
-	MailGuid       string               `spiderweb:"path=mail_guid"`
-	Datastore      db.Datastore         `spiderweb:"resource=datastore"`
-	ResponseBody   *getMailResponse     `spiderweb:"response,mime=application/json"`
+	auth.User
+	pathParams
+	Datastore db.Datastore
+	body.Response[openMailResponse]
 }
 
 func (self *openMail) Handle(ctx context.Context) (int, error) {
-	foundMail, err := self.Datastore.GetMail(ctx, mail.Guid(self.MailGuid))
+	openedMail, err := self.Datastore.OpenMail(ctx, self.MailGuid)
 	if err != nil {
 		if errors.Is(err, db.ErrMailNotFound) {
-			return httpstatus.InternalServerError, errors.Propagate(icGetMailGetMailMailNotFound, err)
+			return httpstatus.NotFound, err
 		} else if errors.Is(err, db.ErrInternalFailure) {
-			return httpstatus.InternalServerError, errors.Propagate(icGetMailGetMailDbError, err)
+			return httpstatus.InternalServerError, err
 		} else {
-			return httpstatus.InternalServerError, errors.Convert(icGetMailGetMailUnknownDbError, err, errUncaughtDbError)
+			return httpstatus.InternalServerError, errors.Wrap(err, errUncaughtDbError)
 		}
 	}
 
-	// User must be the recipient and must be delivered in order to open the mail.
-	if foundMail.CanOpen(user.Guid(self.AuthorizedUser.UserGuid)) && foundMail.IsDelivered() {
-		// Check if this is the first time opening the mail.
-		if !foundMail.IsOpened() {
-			foundMail.OpenedOn = time.Now().UTC()
-			err := self.Datastore.OpenMail(ctx, mail.Guid(self.MailGuid), foundMail.OpenedOn)
-			if err != nil {
-				if errors.Is(err, db.ErrMailNotFound) {
-					return httpstatus.InternalServerError, errors.Propagate(icGetMailOpenMailMailNotFound, err)
-				} else if errors.Is(err, db.ErrInternalFailure) {
-					return httpstatus.InternalServerError, errors.Propagate(icGetMailOpenMailDbError, err)
-				} else {
-					return httpstatus.InternalServerError, errors.Convert(icGetMailOpenMailUnknownDbError, err, errUncaughtDbError)
-				}
-			}
-		}
-
-		self.ResponseBody.MailGuid = string(foundMail.MailGuid)
-		self.ResponseBody.From = string(foundMail.From)
-		self.ResponseBody.To = string(foundMail.To)
-		self.ResponseBody.Contents = foundMail.Contents
-		self.ResponseBody.SentOn = foundMail.SentOn
-		self.ResponseBody.DeliveredOn = foundMail.DeliveredOn
-		self.ResponseBody.OpenedOn = foundMail.OpenedOn
-
-		return httpstatus.OK, nil
+	if openedMail.ToGuid != self.AuthorizedUser.Guid {
+		return httpstatus.Forbidden, errInvalidRecipient
 	}
 
-	return httpstatus.NotFound, errors.Propagate(icGetMailUserNotRecipient, errMailNotFound)
+	self.ResponseBody.MailGuid = openedMail.Guid
+	self.ResponseBody.FromMailboxAddress = openedMail.FromMailboxAddress
+	self.ResponseBody.ToMailboxAddress = openedMail.ToMailboxAddress
+	self.ResponseBody.From = openedMail.Contents.From
+	self.ResponseBody.To = openedMail.Contents.To
+	self.ResponseBody.Body = openedMail.Contents.Body
+	self.ResponseBody.SentOn = openedMail.SentOn
+	self.ResponseBody.DeliveredOn = openedMail.DeliveredOn
+	self.ResponseBody.OpenedOn = openedMail.OpenedOn
+
+	return httpstatus.OK, nil
 }

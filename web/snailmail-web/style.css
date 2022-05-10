@@ -22,8 +22,32 @@ button {
     cursor: pointer;
 }
 
+nav {
+    border: 1px solid dimgray;
+    border-right: none;
+    display: flex;
+    box-orient: horizontal;
+}
+
+nav button {
+    flex: auto;
+    background-color:lightblue;
+    border: none;
+    border-right: 1px solid dimgray;
+    color: teal;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav button:active {
+    background-color: teal;
+    color: lightblue;
+}
+
 button.accept {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
     border: none;
     color: white;
     padding: 5px 5px;
@@ -72,5 +96,39 @@ footer {
 
 .hidden {
     display: none;
+}
+
+#inbox {
+    border-collapse: collapse;
+}
+
+#inbox thead {
+    border-bottom: 3px solid black;
+}
+
+#inbox tbody tr {
+    cursor: pointer;
+    border-bottom: 1px solid darkgrey;
+}
+
+#inbox tbody td {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.unread {
+    font-weight: bolder;
+    background-color: burlywood;
+}
+
+tr.unread td:nth-child(1)::after {
+    content: "*";
+}
+
+#inbox tbody td:last-child {
+    padding-left: 20px;
+    border-bottom: none;
 }
 

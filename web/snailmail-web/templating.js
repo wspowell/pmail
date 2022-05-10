@@ -6,21 +6,31 @@ if (!'content' in document.createElement('template')) {
     console.error("<template> is not supported by your browser");
 }
 
+function GetTemplate(templateId) {
+    const template = document.querySelector("#" + templateId);
+
+    // Clone the new row and insert it into the table
+    const templateClone = template.content.cloneNode(true);
+    return templateClone;
+}
+
+function InsertTemplate(parent, templateClone) {
+    parent.appendChild(templateClone);
+}
+
 function LoadContent(templateId, pageData) {
     console.debug("loading content '" + templateId + "', data: " + JSON.stringify(pageData ? pageData : {}));
 
     // Instantiate the table with the existing HTML tbody
     // and the row with the template
-    var content = document.querySelector("#content");
-    var template = document.querySelector("#" + templateId);
-
-    // Clone the new row and insert it into the table
-    var clone = template.content.cloneNode(true);
+    const content = document.querySelector("#content");
+    const clone = GetTemplate(templateId);
 
     loadPageData(clone, pageData);
 
     removeAllChildNodes(content);
     content.appendChild(clone);
+    InsertTemplate(content, clone);
 }
 
 // UpdateContent that is already loaded into the page.

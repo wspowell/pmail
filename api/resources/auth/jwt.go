@@ -3,25 +3,19 @@ package auth
 import (
 	"time"
 
-	"github.com/wspowell/context"
-
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
 
 	"github.com/wspowell/snailmail/resources/aws"
-	"github.com/wspowell/snailmail/resources/models/user"
-)
-
-const (
-	icTokenParseFailure = "auth-jwt-1"
-	icTokenSignFailure  = "auth-jwt-2"
+	"github.com/wspowell/snailmail/resources/models"
 )
 
 var (
-	ErrTokenInvalid     = errors.New("jwt-1", "invalid token")
-	ErrTokenExpired     = errors.New("jwt-2", "token expired")
-	ErrTokenTooEarly    = errors.New("jwt-3", "token too early")
-	ErrJwtSecretFailure = errors.New("jwt-4", "failed getting JWT signing key")
+	ErrTokenInvalid     = errors.New("invalid token")
+	ErrTokenExpired     = errors.New("token expired")
+	ErrTokenTooEarly    = errors.New("token too early")
+	ErrJwtSecretFailure = errors.New("failed getting JWT signing key")
 )
 
 func GetSigningKey(ctx context.Context) ([]byte, error) {
@@ -39,10 +33,7 @@ type jwtSigningKey struct {
 
 type SnailMailClaims struct {
 	jwt.RegisteredClaims
-	UserGuid          string `json:"userGuid"`
-	Username          string `json:"username"`
-	MailCarryCapacity uint32 `json:"mailCarryCapacity"`
-	PineappleOnPizza  bool   `json:"pineappleOnPizza"`
+	models.User
 }
 
 type Group string
@@ -71,20 +62,19 @@ func NewJwt(signingKey []byte) Jwt {
 	}
 }
 
-func (self Jwt) claims(authUser user.User, permissionGroups jwt.ClaimStrings) SnailMailClaims {
+func (self Jwt) claims(authUser *models.User, permissionGroups jwt.ClaimStrings, expiresAt time.Time) SnailMailClaims {
+	now := time.Now().UTC()
+
 	return SnailMailClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "snailmail",
-			Subject:   string(authUser.UserGuid),
+			Subject:   authUser.Guid,
 			Audience:  permissionGroups,
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
-		UserGuid:          string(authUser.UserGuid),
-		Username:          authUser.Username,
-		MailCarryCapacity: authUser.MailCarryCapacity,
-		PineappleOnPizza:  authUser.PineappleOnPizza,
+		User: *authUser,
 	}
 }
 
@@ -98,7 +88,7 @@ func (self Jwt) ValidateToken(tokenString string) (*SnailMailClaims, error) {
 		return self.signingKey, nil
 	})
 	if err != nil {
-		return nil, errors.Propagate(icTokenParseFailure, ErrTokenInvalid)
+		return nil, ErrTokenInvalid
 	}
 
 	if claims, ok := token.Claims.(*SnailMailClaims); ok && token.Valid {
@@ -116,8 +106,8 @@ func (self Jwt) ValidateToken(tokenString string) (*SnailMailClaims, error) {
 	return nil, ErrTokenInvalid
 }
 
-func (self Jwt) UserToken(authUser user.User) (string, error) {
-	jwtClaims := self.claims(authUser, groupClaims(GroupUser))
+func (self Jwt) UserToken(authUser *models.User, expiresAt time.Time) (string, error) {
+	jwtClaims := self.claims(authUser, groupClaims(GroupUser), expiresAt)
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
@@ -130,7 +120,7 @@ func (self Jwt) signToken(token *jwt.Token) (string, error) {
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString(self.signingKey)
 	if err != nil {
-		return "", errors.Propagate(icTokenSignFailure, err)
+		return "", err
 	}
 
 	return tokenString, nil

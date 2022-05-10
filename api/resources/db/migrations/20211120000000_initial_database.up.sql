@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               5.7.35 - MySQL Community Server (GPL)
+-- Host:                         snailmail-mysql.cicyow4yvieo.us-east-1.rds.amazonaws.com
+-- Server version:               8.0.27 - Source distribution
 -- Server OS:                    Linux
 -- HeidiSQL Version:             11.2.0.6213
 -- --------------------------------------------------------
@@ -12,183 +12,103 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping structure for table snailmail.mail
+-- Dumping structure for table snailmail_redesign.exchanges
+CREATE TABLE IF NOT EXISTS `exchanges` (
+  `id` int unsigned NOT NULL,
+  `location_id` int unsigned NOT NULL,
+  `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_exchanges_locations` (`location_id`),
+  CONSTRAINT `FK_exchanges_locations` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table snailmail_redesign.locations
+CREATE TABLE IF NOT EXISTS `locations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `address` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `geo_coordinate` point NOT NULL,
+  `long_1000_floor` mediumint NOT NULL,
+  `lat_1000_floor` mediumint NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `address` (`address`) USING BTREE,
+  KEY `lat_1000_floor` (`lat_1000_floor`),
+  KEY `long_1000_floor` (`long_1000_floor`),
+  SPATIAL KEY `geo_coordinate` (`geo_coordinate`)
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table snailmail_redesign.mail
 CREATE TABLE IF NOT EXISTS `mail` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `mail_guid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `from` int(10) unsigned NOT NULL,
-  `to` int(10) unsigned NOT NULL,
-  `contents` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `mail_guid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sender` int unsigned DEFAULT NULL,
+  `from` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recipient` int unsigned DEFAULT NULL,
+  `to` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `starting_location` int unsigned DEFAULT NULL,
+  `destination` int unsigned DEFAULT NULL,
+  `address` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contents` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `sent_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `delivered_on` timestamp NULL DEFAULT NULL,
   `opened_on` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `mail_guid` (`mail_guid`),
-  KEY `FK_mail_from` (`from`),
-  KEY `FK_mail_to` (`to`),
-  CONSTRAINT `FK_mail_from` FOREIGN KEY (`from`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_mail_to` FOREIGN KEY (`to`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.mailboxes
-CREATE TABLE IF NOT EXISTS `mailboxes` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `address` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` int(10) unsigned DEFAULT NULL,
-  `capacity` int(10) unsigned NOT NULL,
-  `latitude` decimal(10,8) NOT NULL,
-  `longitude` decimal(11,8) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `address` (`address`) USING BTREE,
-  KEY `FK_mailboxes_owner` (`owner`),
-  CONSTRAINT `FK_mailboxes_owner` FOREIGN KEY (`owner`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.mailbox_mail
-CREATE TABLE IF NOT EXISTS `mailbox_mail` (
-  `mailbox_id` int(10) unsigned NOT NULL,
-  `mail_id` int(10) unsigned NOT NULL,
-  KEY `FK_mailbox_mail_mailbox_id` (`mailbox_id`),
-  KEY `FK_mailbox_mail_mail_id` (`mail_id`),
-  CONSTRAINT `FK_mailbox_mail_mail_id` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_mailbox_mail_mailbox_id` FOREIGN KEY (`mailbox_id`) REFERENCES `mailboxes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.mail_carriers
-CREATE TABLE IF NOT EXISTS `mail_carriers` (
-  `user_id` int(10) unsigned NOT NULL,
-  `mail_id` int(10) unsigned NOT NULL,
-  UNIQUE KEY `mail_id` (`mail_id`),
-  KEY `FK_mail_carriers_mail_guid` (`mail_id`) USING BTREE,
-  KEY `FK_mail_carriers_user_guid` (`user_id`) USING BTREE,
-  CONSTRAINT `FK_mail_carriers_mail_id` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_mail_carriers_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.mail_history
-CREATE TABLE IF NOT EXISTS `mail_history` (
-  `mail_id` int(10) unsigned NOT NULL,
-  `mailbox_id` int(10) unsigned NOT NULL,
-  `carrier` int(10) unsigned NOT NULL,
-  `dropped_off_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `distance_carried` decimal(20,6) NOT NULL,
-  KEY `FK_mail_history_mail_id` (`mail_id`),
-  KEY `FK_mail_history_mailbox_id` (`mailbox_id`),
-  KEY `FK_mail_history_carrier` (`carrier`),
-  CONSTRAINT `FK_mail_history_carrier` FOREIGN KEY (`carrier`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_mail_history_mail_id` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_mail_history_mailbox_id` FOREIGN KEY (`mailbox_id`) REFERENCES `mailboxes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.penpals
-CREATE TABLE IF NOT EXISTS `penpals` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `sender` int(10) unsigned NOT NULL,
-  `receiver` int(10) unsigned NOT NULL,
-  `pending` tinyint(1) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `dRelationships_status` (`pending`) USING BTREE,
-  KEY `FK_penpals_receiver` (`receiver`),
-  KEY `FK_penpals_sender` (`sender`),
-  CONSTRAINT `FK_penpals_receiver` FOREIGN KEY (`receiver`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_penpals_sender` FOREIGN KEY (`sender`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.schema_migrations
-CREATE TABLE IF NOT EXISTS `schema_migrations` (
-  `version` bigint(20) NOT NULL,
-  `dirty` tinyint(1) NOT NULL,
-  PRIMARY KEY (`version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.users
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_guid` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `username` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `pineapple_on_pizza` tinyint(1) unsigned NOT NULL,
-  `mailbag_capacity` int(10) unsigned NOT NULL,
-  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `secret` char(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `salt` char(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `username` (`username`) USING BTREE,
-  UNIQUE KEY `user_guid` (`user_guid`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `mail_guid` (`mail_guid`) USING BTREE,
+  KEY `FK_mail_users` (`sender`) USING BTREE,
+  KEY `FK_mail_locations` (`destination`),
+  KEY `FK_mail_users_2` (`recipient`),
+  KEY `FK_mail_locations_2` (`starting_location`),
+  CONSTRAINT `FK_mail_locations` FOREIGN KEY (`destination`) REFERENCES `locations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_mail_locations_2` FOREIGN KEY (`starting_location`) REFERENCES `locations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_mail_users` FOREIGN KEY (`sender`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_mail_users_2` FOREIGN KEY (`recipient`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
--- Dumping structure for table snailmail.user_blocks
-CREATE TABLE IF NOT EXISTS `user_blocks` (
-  `blocker` int(10) unsigned NOT NULL,
-  `blockee` int(10) unsigned NOT NULL,
-  UNIQUE KEY `blocker_blockee` (`blocker`,`blockee`),
-  KEY `blockee` (`blockee`) USING BTREE,
-  KEY `blocker` (`blocker`),
-  CONSTRAINT `FK_user_blocks_blockee` FOREIGN KEY (`blockee`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_user_blocks_blocker` FOREIGN KEY (`blocker`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+-- Dumping structure for table snailmail_redesign.mailboxes
+CREATE TABLE IF NOT EXISTS `mailboxes` (
+  `location_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  KEY `FK_mailboxes_locations` (`location_id`),
+  KEY `FK_mailboxes_users` (`user_id`) USING BTREE,
+  CONSTRAINT `FK_mailboxes_locations` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_mailboxes_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
--- Dumping structure for table snailmail.user_inbox
-CREATE TABLE IF NOT EXISTS `user_inbox` (
-  `mail_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`mail_id`),
-  KEY `FK_user_inbox_mail_id` (`mail_id`),
-  CONSTRAINT `FK_user_inbox_mail_id` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+-- Dumping structure for table snailmail_redesign.mail_tracking
+CREATE TABLE IF NOT EXISTS `mail_tracking` (
+  `mail_id` int unsigned NOT NULL,
+  `carrier` int unsigned DEFAULT NULL,
+  `exchange` int unsigned DEFAULT NULL,
+  `last_carrier` int unsigned DEFAULT NULL,
+  `updated_at` timestamp NOT NULL,
+  KEY `FK_mail_tracking_mail` (`mail_id`),
+  KEY `FK_mail_tracking_users` (`carrier`),
+  KEY `FK_mail_tracking_exchanges` (`exchange`),
+  KEY `FK_mail_tracking_users_2` (`last_carrier`),
+  CONSTRAINT `FK_mail_tracking_exchanges` FOREIGN KEY (`exchange`) REFERENCES `exchanges` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_mail_tracking_mail` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_mail_tracking_users` FOREIGN KEY (`carrier`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_mail_tracking_users_2` FOREIGN KEY (`last_carrier`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
--- Dumping structure for table snailmail.user_mailbox_labels
-CREATE TABLE IF NOT EXISTS `user_mailbox_labels` (
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `mailbox_id` int(10) unsigned DEFAULT NULL,
-  `label` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  UNIQUE KEY `user_id_mailbox_id` (`user_id`,`mailbox_id`) USING BTREE,
-  KEY `user_id` (`user_id`),
-  KEY `mailbox_id` (`mailbox_id`),
-  CONSTRAINT `FK_user_mailbox_labels_mailbox_id` FOREIGN KEY (`mailbox_id`) REFERENCES `mailboxes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_user_mailbox_labels_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.user_outbox
-CREATE TABLE IF NOT EXISTS `user_outbox` (
-  `mail_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`mail_id`),
-  KEY `FK_user_outbox_mail_id` (`mail_id`),
-  CONSTRAINT `FK_user_outbox_mail_id` FOREIGN KEY (`mail_id`) REFERENCES `mail` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table snailmail.user_penpals
-CREATE TABLE IF NOT EXISTS `user_penpals` (
-  `user_id` int(11) unsigned NOT NULL,
-  `penpal_id` int(11) unsigned NOT NULL,
-  UNIQUE KEY `user_id_penpal_id` (`user_id`,`penpal_id`),
-  KEY `penpal_id` (`penpal_id`) USING BTREE,
-  KEY `user_id` (`user_id`) USING BTREE,
-  CONSTRAINT `FK_user_penpals_penpal_id` FOREIGN KEY (`penpal_id`) REFERENCES `penpals` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_user_penpals_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Dumping structure for table snailmail_redesign.users
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `guid` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `public_key` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `signature` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 

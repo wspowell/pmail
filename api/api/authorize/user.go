@@ -2,60 +2,78 @@ package authorize
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
-	"github.com/wspowell/log"
+	"github.com/wspowell/spiderweb/body"
 	"github.com/wspowell/spiderweb/httpstatus"
+	"github.com/wspowell/spiderweb/mime"
 
 	"github.com/wspowell/snailmail/resources/auth"
 	"github.com/wspowell/snailmail/resources/db"
-	"github.com/wspowell/snailmail/resources/models/user"
+	"github.com/wspowell/snailmail/resources/models"
 )
 
 type jwtRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	mime.Json
+
+	UserGuid  string `json:"userGuid"`
+	SignedKey string `json:"signedKey"`
 }
 
 type jwtResponse struct {
+	mime.Json
+
 	JwtToken string `json:"jwtToken"`
 }
 
-type userTokener interface {
-	UserToken(authUser user.User) (string, error)
+type UserTokener interface {
+	UserToken(authUser *models.User, expiresAt time.Time) (string, error)
 }
 
 type authUser struct {
-	JwtAuth      userTokener  `spiderweb:"resource=jwt"`
-	Datastore    db.Datastore `spiderweb:"resource=datastore"`
-	RequestBody  *jwtRequest  `spiderweb:"request,mime=application/json"`
-	ResponseBody *jwtResponse `spiderweb:"response,mime=application/json"`
+	JwtAuth   UserTokener
+	Datastore db.Datastore
+	body.Request[jwtRequest]
+	body.Response[jwtResponse]
 }
 
 func (self *authUser) Handle(ctx context.Context) (int, error) {
-	password, err := auth.Password(ctx, self.RequestBody.Password)
-	if err != nil {
-		return http.StatusInternalServerError, errors.Propagate(icAuthUserPasswordError, err)
-	}
-
-	authedUser, err := self.Datastore.AuthUser(ctx, self.RequestBody.Username, password)
+	foundUser, err := self.Datastore.GetUser(ctx, self.RequestBody.UserGuid)
 	if err != nil {
 		if errors.Is(err, db.ErrUserNotFound) {
-			return httpstatus.NotFound, errors.Propagate(icAuthUserUserNotFound, err)
+			return httpstatus.NotFound, err
 		} else if errors.Is(err, db.ErrInternalFailure) {
-			return http.StatusInternalServerError, errors.Propagate(icAuthUserDbError, err)
+			return http.StatusInternalServerError, err
 		} else {
-			return http.StatusInternalServerError, errors.Convert(icAuthUserUnknownDbError, err, errUncaughtDbError)
+			return http.StatusInternalServerError, errors.Wrap(err, errUncaughtDbError)
 		}
 	}
 
-	jwtToken, err := self.JwtAuth.UserToken(*authedUser)
-	if err != nil {
-		return http.StatusInternalServerError, errors.Convert(icAuthUserJwtError, err, errJwtError)
+	if self.RequestBody.SignedKey != auth.Sign(foundUser.PublicKey, foundUser.Signature) {
+		// Invalid credentials.
+		// Treat this case as if the user was not found.
+		return httpstatus.NotFound, db.ErrUserNotFound
 	}
 
-	log.Debug(ctx, "authed user: %+v", authedUser)
+	userMailbox, err := self.Datastore.GetUserMailbox(ctx, self.RequestBody.UserGuid)
+	if err != nil {
+		if errors.Is(err, db.ErrInternalFailure) {
+			return httpstatus.NotFound, err
+		} else if errors.Is(err, db.ErrInternalFailure) {
+			return http.StatusInternalServerError, err
+		} else {
+			return http.StatusInternalServerError, errors.Wrap(err, errUncaughtDbError)
+		}
+	}
+
+	foundUser.Mailbox = *userMailbox
+
+	jwtToken, err := self.JwtAuth.UserToken(foundUser, time.Now().UTC().Add(time.Hour))
+	if err != nil {
+		return http.StatusInternalServerError, errors.Wrap(err, errJwtError)
+	}
 
 	self.ResponseBody.JwtToken = jwtToken
 

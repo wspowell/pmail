@@ -5,72 +5,56 @@ import (
 
 	"github.com/wspowell/context"
 	"github.com/wspowell/errors"
+	"github.com/wspowell/log"
+	"github.com/wspowell/spiderweb/body"
 	"github.com/wspowell/spiderweb/httpstatus"
+	"github.com/wspowell/spiderweb/mime"
 
-	"github.com/wspowell/snailmail/middleware"
+	"github.com/wspowell/snailmail/resources/auth"
 	"github.com/wspowell/snailmail/resources/db"
-	"github.com/wspowell/snailmail/resources/models/mail"
-	"github.com/wspowell/snailmail/resources/models/user"
+	"github.com/wspowell/snailmail/resources/models"
 )
 
 type createMailRequest struct {
-	To       string `json:"to"`
-	Contents string `json:"contents"`
-}
+	mime.Json
 
-type createMailResponse struct {
-	MailGuid string `json:"mailGuid"`
+	From             string `json:"from"`
+	To               string `json:"to"`
+	ToMailboxAddress string `json:"toMailboxAddress"`
+	Body             string `json:"body"`
 }
 
 type createMail struct {
-	AuthorizedUser *middleware.UserAuth `spiderweb:"auth"`
-	Datastore      db.Datastore         `spiderweb:"resource=datastore"`
-	RequestBody    *createMailRequest   `spiderweb:"request,mime=application/json"`
-	ResponseBody   *createMailResponse  `spiderweb:"response,mime=application/json"`
+	auth.User
+	Datastore db.Datastore
+	body.Request[createMailRequest]
 }
 
 func (self *createMail) Handle(ctx context.Context) (int, error) {
-	if self.RequestBody.Contents == "" {
-		return httpstatus.UnprocessableEntity, errors.Propagate(icCreateMailEmptyContents, errEmptyContents)
+	if self.RequestBody.Body == "" {
+		return httpstatus.UnprocessableEntity, errEmptyContents
 	}
 
-	// Check that the "to" mailbox address exists.
-	toMailbox, err := self.Datastore.GetMailbox(ctx, self.RequestBody.To)
-	if err != nil {
-		if errors.Is(err, db.ErrMailboxNotFound) {
-			return httpstatus.NotFound, errors.Propagate(icCreateMailGetMailboxByLabelMailboxNotFound, err)
-		} else if errors.Is(err, db.ErrInternalFailure) {
-			return httpstatus.InternalServerError, errors.Propagate(icCreateMailGetMailboxByLabelDbError, err)
-		} else {
-			return httpstatus.InternalServerError, errors.Convert(icCreateMailGetMailboxByLabelUnknownDbError, err, errUncaughtDbError)
-		}
+	contents := models.MailContents{
+		From: self.RequestBody.From,
+		To:   self.RequestBody.To,
+		Body: self.RequestBody.Body,
 	}
-
-	if toMailbox.Owner == user.Guid(self.AuthorizedUser.UserGuid) {
-		return httpstatus.Conflict, errors.Propagate(icCreateMailInvalidRecipient, errInvalidRecipient)
-	}
-
-	mailAttributes := mail.Attributes{
-		From:     user.Guid(self.AuthorizedUser.UserGuid),
-		To:       toMailbox.Owner,
-		Contents: self.RequestBody.Contents,
-		Carrier:  user.Guid(self.AuthorizedUser.UserGuid),
-	}
-	newMail := mail.NewMail(mailAttributes)
+	newMail := models.CreateMail(self.AuthorizedUser.Guid, self.AuthorizedUser.Mailbox.Address, self.RequestBody.ToMailboxAddress, contents)
 	newMail.SentOn = time.Now().UTC()
 
-	err = self.Datastore.CreateMail(ctx, newMail)
+	err := self.Datastore.CreateMail(ctx, newMail)
 	if err != nil {
 		if errors.Is(err, db.ErrMailboxNotFound) {
-			return httpstatus.NotFound, errors.Propagate(icCreateMailCreateMailboxMailboxNotFound, err)
+			return httpstatus.NotFound, err
 		} else if errors.Is(err, db.ErrInternalFailure) {
-			return httpstatus.InternalServerError, errors.Propagate(icCreateMailCreateMailDbError, err)
+			return httpstatus.InternalServerError, err
 		} else {
-			return httpstatus.InternalServerError, errors.Convert(icCreateMailCreateMailUnknownDbError, err, errUncaughtDbError)
+			return httpstatus.InternalServerError, errors.Wrap(err, errUncaughtDbError)
 		}
 	}
 
-	self.ResponseBody.MailGuid = string(newMail.MailGuid)
+	log.Debug(ctx, "created mail: %+v", newMail)
 
 	return httpstatus.Created, nil
 }

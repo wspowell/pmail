@@ -5,14 +5,9 @@ import (
 )
 
 var (
-	errUncaughtDbError = errors.New("snailmail-auth-1", "uncaught database error")
-	errJwtError        = errors.New("snailmail-auth-1", "failure signing jwt")
-)
-
-const (
-	icAuthUserUserNotFound   = "snailmail-auth-1"
-	icAuthUserDbError        = "snailmail-auth-2"
-	icAuthUserUnknownDbError = "snailmail-auth-3"
-	icAuthUserJwtError       = "snailmail-auth-4"
-	icAuthUserPasswordError  = "snailmail-auth-5"
+	errUncaughtDbError = errors.New("uncaught database error")
+	errJwtError        = errors.New("failure signing jwt")
+	errAwsError        = errors.New("failed contacting AWS")
+	errNotFound        = errors.New("not found")
+	errNoUserMailbox   = errors.New("user has no mailbox")
 )

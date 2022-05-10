@@ -1,14 +1,4 @@
-# See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.166.0/containers/go/.devcontainer/base.Dockerfile
-
-# [Choice] Go version: 1, 1.16, 1.15
-ARG VARIANT="1"
-FROM mcr.microsoft.com/vscode/devcontainers/go:0-1.17
-
-# [Option] Install Node.js
-ARG INSTALL_NODE="true"
-ARG NODE_VERSION="lts/*"
-RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
-
+FROM golang:1.18beta2
 
 # Install Docker CE CLI
 RUN apt-get update \
@@ -33,12 +23,10 @@ RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/comp
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
 
-ENV GOPATH=/app/api
-
 RUN apt update
 RUN apt install -y graphviz vim unzip make 
 
-RUN sudo apt install whois
+RUN apt install whois
 
 RUN mkdir -p /temp && cd /temp
 RUN wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
@@ -46,14 +34,23 @@ RUN unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
 RUN ./sam-installation/install
 RUN sam --version
 
-RUN go get github.com/vektra/mockery/v2/.../
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+RUN aws --version
+
+RUN apt install zip less
+
+RUN go install github.com/vektra/mockery/v2@latest
 RUN go install mvdan.cc/gofumpt@latest
 
+
 # Install terraform
-# RUN sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
-# RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-# RUN sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-# RUN sudo apt-get update && sudo apt-get install terraform
+RUN apt-get update && apt-get install -y gnupg software-properties-common curl
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+RUN apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+RUN apt-get update && apt-get install terraform
+RUN terraform -version
 
 #ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
 #CMD [ "sleep", "infinity" ]
